@@ -34,6 +34,8 @@ class LeaderBoard(APIView):
         maxes = data.get_maxes()
         totals = data.get_totals()
 
+        print(maxes)
+
         return Response({
             'leaders': leaders,
             'weekly': [],

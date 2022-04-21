@@ -6,10 +6,10 @@ from ranker.core.models import Player, Event, Match
 
 class PlayerSerializer(serializers.ModelSerializer):
     full_name = serializers.ReadOnlyField()
-    rating = serializers.DecimalField(
-        max_digits=10,
-        decimal_places=2
-    )
+    # rating = serializers.DecimalField(
+    #     max_digits=10,
+    #     decimal_places=2
+    # )
 
     class Meta:
         model = Player

@@ -150,34 +150,36 @@ def get_leaders(*, n_players: int = 5, rating_trend_days: int = 7) -> list:
 
 def get_maxes() -> dict:
 
-    # if not Match.objects.exists():
-    #     return dict()
+    if not Match.objects.exists():
+        return dict()
 
-    # matches = pd.DataFrame(Match.objects.values('winner_id', 'loser_id'))
-    # ratings = pd.DataFrame(Player.objects.values('id', 'rating'))
+    matches = pd.DataFrame(Match.objects.values('winner_id', 'loser_id'))
+    ratings = pd.DataFrame(PlayerRating.objects.values('player_id', 'rating'))
 
-    # wins = matches.groupby('winner_id').size()
-    # losses = matches.groupby('loser_id').size()
-    # ratings = ratings.set_index('id')['rating'] - Player.INITIAL_RATING_SCORE
-    # total = wins + losses
+    wins = matches.groupby('winner_id').size()
+    losses = matches.groupby('loser_id').size()
+    ratings = ratings.set_index('player_id')['rating']
+    total = wins.append(losses)
 
-    # metrics = [
-    #     ('games', wins + losses),
-    #     ('winrate', wins / total),
-    #     ('efficiency', ratings / total)
-    # ]
+    print(total)
 
-    # result = {}
+    metrics = [
+        ('games', total),
+        ('winrate', wins / total),
+        ('efficiency', ratings / total)
+    ]
 
-    # for metric, data in metrics:
-    #     idx = data.idxmax()
-    #     result[metric] = [{
-    #         'id': idx,
-    #         'name': Player.objects.get(pk=idx).full_name,
-    #         'value': data[idx]
-    #     }]
+    result = {}
 
-    return [] #result
+    for metric, data in metrics:
+        idx = data.idxmax()
+        result[metric] = [{
+            'id': idx,
+            'name': Player.objects.get(pk=idx).full_name,
+            'value': data[idx]
+        }]
+
+    return result
 
 
 def get_totals() -> list:
