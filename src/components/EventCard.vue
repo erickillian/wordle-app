@@ -70,7 +70,8 @@ export default {
   methods: {
     playerClick(player_id) {
       let url = `/players/${player_id}`
-      window.open(url, '_blank')
+      // window.open(url, '_blank')
+      this.$router.push(url)
     },
   },
   computed: {

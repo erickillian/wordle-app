@@ -1,191 +1,215 @@
-from django.db import models, transaction
+from django.db import models
+from django.db.models import Sum
+from django.db.models.functions import Coalesce
+from django.utils import timezone
 
 from django.contrib.auth.models import AbstractUser
-from django.utils.translation import gettext_lazy as _
 
-from ranker.core.services import rating
 
-DEFAULT_COEF = 0.6
+from ranker.core.rankings import EloRating
+import json
 
 
 class User(AbstractUser):
-    phone = models.CharField(
-        verbose_name=_('phone number'), max_length=40, null=True, blank=True
-    )
+    # phone = models.CharField(
+    #     verbose_name=_('phone number'), max_length=40, null=True, blank=True
+    # )
 
     class Meta:
         db_table = 'user'
 
 
 class Player(models.Model):
-    INITIAL_RATING_SCORE = 350
-    RIGHT_HAND = 'R'
-    LEFT_HAND = 'L'
+    """Table for keeping player information."""
+    first_name = models.CharField(max_length=50, blank=False)
+    last_name = models.CharField(max_length=50, blank=False)
 
-    MAIN_HAND_CHOICES = [
-        (RIGHT_HAND, _('Right')),
-        (LEFT_HAND, _('Left'))
-    ]
+    class Meta:
+        unique_together = ('first_name', 'last_name',)
 
-    first_name = models.CharField(verbose_name=_('first Name'), max_length=40, null=False)
-    last_name = models.CharField(verbose_name=_('last name'), max_length=40, null=False)
-    username = models.CharField(verbose_name=_('username'), max_length=40, unique=True)
-    date_of_birth = models.DateField(verbose_name=_('date of birth'), null=False)
-    city = models.CharField(verbose_name=_('city'), max_length=40, null=False)
-    hand = models.CharField(max_length=1, choices=MAIN_HAND_CHOICES, default=RIGHT_HAND)
-    equipment = models.TextField(verbose_name=_('equipment'), max_length=255)
-    rating = models.FloatField(null=False, default=INITIAL_RATING_SCORE)
+    def __str__(self):
+        """Display player's full name as string object representation."""
+        return self.full_name
 
     @property
     def full_name(self):
-        return '{0} {1}'.format(self.last_name, self.first_name)
-
-    def __str__(self):
-        return '{0} ({1})'.format(self.full_name, self.rating)
+        """The players full name, first plus last name."""
+        full_name = f'{self.first_name} {self.last_name}'
+        return full_name
 
     class Meta:
         db_table = 'player'
-        verbose_name = _('player')
-        verbose_name_plural = _('players')
-
-
-class Event(models.Model):
-    name = models.CharField(verbose_name=_('name'), max_length=255, null=False)
-    short_name = models.CharField(verbose_name=_('short name'), max_length=30, null=False)
-    address = models.CharField(verbose_name=_('address'), max_length=255, null=False)
-    coefficient = models.FloatField(
-        verbose_name=_('rating coefficient'), null=False, default=DEFAULT_COEF
-    )
-
-    def __str__(self):
-        return '{0}, {1}: {2}'.format(
-            self.name,
-            _('coef'),
-            self.coefficient
-        )
-
-    class Meta:
-        db_table = 'event'
-        verbose_name = _('event')
-        verbose_name_plural = _('events')
+        verbose_name = ('player')
+        verbose_name_plural = ('players')
 
 
 class Match(models.Model):
-
-    # Codes are winner places
-    FINAL = 1
-    THIRD_PLACE = 3
-
-    EVENT_PHASE_CHOICES = [
-        (FINAL, _('Final')),
-        (THIRD_PLACE, _('Third Place Match'))
-    ]
-
-    event = models.ForeignKey(
-        'Event',
-        verbose_name=_('event'),
-        null=False,
-        on_delete=models.CASCADE
-    )
-    event_date = models.DateField(verbose_name=_('event date'), null=False)
-    event_phase = models.IntegerField(choices=EVENT_PHASE_CHOICES, null=True, blank=True)
-    winner = models.ForeignKey(
-        'Player',
-        db_index=True,
-        verbose_name=_('winner'),
-        null=False,
-        on_delete=models.CASCADE,
-        related_name='winner'
-    )
-    loser = models.ForeignKey(
-        'Player',
-        db_index=True,
-        verbose_name=_('loser'),
-        null=False,
-        on_delete=models.CASCADE,
-        related_name='loser'
-    )
-    winner_score = models.PositiveSmallIntegerField(
-        verbose_name=_('winner score'), null=False
-    )
-    loser_score = models.PositiveSmallIntegerField(
-        verbose_name=_('loser score'), null=False
-    )
-    winner_rating = models.FloatField(verbose_name=_('winner rating'))
-    loser_rating = models.FloatField(verbose_name=_('loser rating'))
-    delta = models.FloatField(verbose_name=_('rating delta'))
-
-    is_technical = models.BooleanField(
-        verbose_name=_('technical result'), null=False, default=False
-    )
-
-    def save(self, *args, **kwargs):
-        with transaction.atomic():
-
-            # Get new rating values and delta
-            new_winner_rating, new_loser_rating, delta = rating.calculate_new_rating(
-                winner_rating=self.winner.rating,
-                loser_rating=self.loser.rating,
-                coef=self.event.coefficient
-            )
-
-            # Updating cache fields for match statistics and save match
-            self.winner_rating = self.winner.rating
-            self.loser_rating = self.loser.rating
-            self.delta = delta
-
-            super().save(*args, **kwargs)
-
-            # Updating actual ratings and history to date for each player
-            self.winner.rating = new_winner_rating
-            self.winner.save()
-
-            self.loser.rating = new_loser_rating
-            self.loser.save()
-
-            RatingHistory.objects.update_or_create(
-                player=self.winner,
-                date=self.event_date,
-                defaults={
-                    'rating': self.winner.rating
-                }
-            )
-
-            RatingHistory.objects.update_or_create(
-                player=self.loser,
-                date=self.event_date,
-                defaults={
-                    'rating': self.loser.rating
-                }
-            )
+    """Table for keeping track of game scores and winners."""
+    winner = models.ForeignKey(Player, default=None, related_name='won_matches',on_delete=models.CASCADE)
+    winning_score = models.IntegerField(default=None)
+    loser = models.ForeignKey(Player, default=None, related_name='lost_matches', on_delete=models.CASCADE)
+    losing_score = models.IntegerField(default=None)
+    datetime = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return '{0}: {1}, {2} vs {3}, {4}-{5}'.format(
-            self.event.name, self.event_date, self.winner,
-            self.loser, self.winner_score, self.loser_score
+        """Display match description as string object representation."""
+        return self.description
+
+    @staticmethod
+    def get_recent_matches(num_matches: int):
+        """Get specified number of recent matches in descending date."""
+        recent_matches = Match.objects.all().order_by('-datetime')
+        if recent_matches is not None:
+            recent_matches = recent_matches[0:num_matches]
+        return recent_matches
+
+    @property
+    def score(self):
+        """Hyphenated version of match score, i.e. 21-19"""
+        score = f'{self.winning_score}-{self.losing_score}'
+        return score
+
+    @property
+    def date(self):
+        """Date part of match datetime."""
+        date = self.datetime.strftime('%m/%d/%Y')
+        return date
+    
+    @property
+    def description(self):
+        """Description of who defeated who and what the score was."""
+        description = (
+            f'{self.date}: {self.winner} defeated {self.loser} {self.score}'
         )
+        return description
+
+    def save(self, *args, **kwargs):
+        if self.id:  # occurs when the match already exists and is being updated
+            super().save(*args, **kwargs)
+            PlayerRating.generate_ratings()
+        else:  # occurs when it's a new match being added
+            super().save(*args, **kwargs)
+            elo_rating = EloRating(use_current_ratings=True)
+            elo_rating.update_ratings(self.winner, self.loser)
+            PlayerRating.add_ratings(elo_rating)
 
     class Meta:
         db_table = 'match'
-        verbose_name = _('match result')
-        verbose_name_plural = _('match results')
+        verbose_name = ('match')
+        verbose_name_plural = ('matchs')
 
 
-class RatingHistory(models.Model):
-    player = models.ForeignKey(
-        'Player',
-        db_index=True,
-        verbose_name=_('player'),
-        null=False,
-        on_delete=models.CASCADE
-    )
-    date = models.DateField(db_index=True, verbose_name=_('date'), null=False)
-    rating = models.FloatField(null=False)
+class PlayerRating(models.Model):
+    """Table for keeping track of a player's rating."""
+    player = models.OneToOneField(Player, default=None, primary_key=True, on_delete=models.CASCADE)
+    rating = models.IntegerField(default=None, blank=False)
+    
+    @staticmethod
+    def add_ratings(elo_rating: EloRating):
+        """Add ratings to database given EloRating object."""
+        PlayerRating.objects.all().delete()
+        for player, rating in elo_rating.ratings.items():
+            PlayerRating.objects.create(player=player, rating=rating)
 
-    def __str__(self):
-        return "{0} {1}".format(self.player.full_name, self.date)
+    @staticmethod
+    def generate_ratings():
+        """Generate ratings from scratch based on all previous matches."""
+        elo_rating = EloRating()
+        matches = Match.objects.all().order_by('datetime')
+        for match in matches:
+            elo_rating.update_ratings(match.winner, match.loser)
+        PlayerRating.add_ratings(elo_rating)
+
+    @property
+    def games_played(self):
+        """Returns the number of games played."""
+        games_played = self.wins + self.losses
+        return games_played
+        
+    @property
+    def losses(self):
+        """Returns the number of losses."""
+        losses = Match.objects.filter(loser=self.player).count()
+        return losses
+
+    @property
+    def wins(self):
+        """Returns the number of wins."""
+        wins = Match.objects.filter(winner=self.player).count()
+        return wins
+
+    @property
+    def points_won(self):
+        """Returns the number of points won."""
+        winning_matches = Match.objects.filter(winner=self.player)
+        losing_matches = Match.objects.filter(loser=self.player)
+        points_won = (
+            winning_matches.aggregate(points=Coalesce(Sum('winning_score'), 0))['points']
+            + losing_matches.aggregate(points=Coalesce(Sum('losing_score'), 0))['points']
+        )
+        return points_won
+
+    @property
+    def points_lost(self):
+        """Returns the number of points lost."""
+        winning_matches = Match.objects.filter(winner=self.player)
+        losing_matches = Match.objects.filter(loser=self.player)
+        points_lost = (
+            winning_matches.aggregate(points=Coalesce(Sum('losing_score'), 0))['points']
+            + losing_matches.aggregate(points=Coalesce(Sum('winning_score'), 0))['points']
+        )
+        return points_lost
+
+    @property
+    def points_per_game(self):
+        """Returns the number of wins."""
+        points_per_game = self.points_won / self.games_played
+        return points_per_game
+
+    @property
+    def point_differential(self):
+        """Return the points won minus points lost."""
+        point_differential = self.points_won - self.points_lost
+        return point_differential
+
+    @property
+    def avg_point_differential(self):
+        """Return the avergae point differential."""
+        avg_point_differential = self.point_differential / self.games_played
+        return avg_point_differential
+
+    @property
+    def win_percent(self):
+        """Return the win percentage."""
+        win_percent = self.wins / self.games_played
+        return win_percent
+
+    @property
+    def rating_history_report(self):
+        """Returns a history report of your rating."""
+        rating_history = []
+
+        elo_rating = EloRating()
+        matches = Match.objects.all().order_by('datetime')
+        for match in matches:
+            elo_rating.update_ratings(match.winner, match.loser)
+            rating_elem = {}
+            rating_elem['x'] = match.datetime.timestamp()
+            rating_elem['y'] = elo_rating.get_rating(self.player)
+            rating_history.append(rating_elem)
+        return rating_history
+
 
     class Meta:
-        db_table = 'ratinghistory'
-        verbose_name = _('rating history')
-        verbose_name_plural = _('rating history')
+        db_table = 'player_rating'
+        verbose_name = ('player_rating')
+        verbose_name_plural = ('player_ratings')
+
+
+class Event(models.Model):
+    name = models.CharField(verbose_name=('name'), max_length=255, null=False)
+
+    class Meta:
+        db_table = 'event'
+        verbose_name = ('event')
+        verbose_name_plural = ('events')

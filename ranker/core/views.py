@@ -6,12 +6,12 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from ranker.core.models import (
-    Player, Event, RatingHistory
+    Player, Event
 )
 from ranker.core.serializers import (
     PlayerSerializer,
     EventSerializer,
-    RatingHistorySerializer,
+    # RatingHistorySerializer,
     MatchHistorySerializer
 )
 from ranker.core.services import data
@@ -30,13 +30,13 @@ class LeaderBoard(APIView):
     @method_decorator(cache_page(LB_CACHE_MINUTES * 60, cache='leaderboard', key_prefix=''))
     def get(self, request):
         leaders = data.get_leaders(n_players=N_PLAYERS, rating_trend_days=N_DAYS_STATS_MAIN)
-        changes = data.get_changes_in_time(n_players=N_PLAYERS, n_days=N_DAYS_STATS_MAIN)
+        # changes = data.get_changes_in_time(n_players=N_PLAYERS, n_days=N_DAYS_STATS_MAIN)
         maxes = data.get_maxes()
         totals = data.get_totals()
 
         return Response({
             'leaders': leaders,
-            'weekly': changes,
+            'weekly': [],
             'maxes': maxes,
             'totals': totals
         })
@@ -71,9 +71,10 @@ class PlayerRatingHistory(APIView):
     Player history rating for charts
     """
     def get(self, request, player_id):
-        history = RatingHistory.objects.filter(player_id=player_id).order_by('date')
-        serializer = RatingHistorySerializer(history, many=True)
-        return Response(serializer.data)
+        return []
+        # history = RatingHistory.objects.filter(player_id=player_id).order_by('date')
+        # serializer = RatingHistorySerializer(history, many=True)
+        # return Response(serializer.data)
 
 
 class PlayerMatchHistory(APIView):

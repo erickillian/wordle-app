@@ -1,7 +1,7 @@
 
 from rest_framework import serializers
 
-from ranker.core.models import Player, Event, Match, RatingHistory
+from ranker.core.models import Player, Event, Match
 
 
 class PlayerSerializer(serializers.ModelSerializer):
@@ -17,21 +17,21 @@ class PlayerSerializer(serializers.ModelSerializer):
 
 
 class EventSerializer(serializers.ModelSerializer):
-
+    
     class Meta:
         model = Event
         fields = '__all__'
 
 
-class RatingHistorySerializer(serializers.ModelSerializer):
-    rating = serializers.DecimalField(
-        max_digits=10,
-        decimal_places=2
-    )
+# class RatingHistorySerializer(serializers.ModelSerializer):
+#     rating = serializers.DecimalField(
+#         max_digits=10,
+#         decimal_places=2
+#     )
 
-    class Meta:
-        model = RatingHistory
-        exclude = ['id', 'player']
+#     class Meta:
+#         model = RatingHistory
+#         exclude = ['id', 'player']
 
 
 class MatchSerializer(serializers.ModelSerializer):

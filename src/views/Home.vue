@@ -1,6 +1,6 @@
 <template>
   <v-row class="ma-0" style="height: 100%">
-    <v-col cols="12" md="6">
+    <v-col>
       <v-row>
         <v-col
           class="pt-0"
@@ -10,14 +10,16 @@
           <BigNumberCard :total="total" />
         </v-col>
       </v-row>
-
-      <LeadersCard
-        :title="$t('leaderboard.top')"
-        :leaders="$store.state.lb.leaders"
-      />
-      
+      <v-row class="mb-3">
+        <v-col class="pt-0">
+          <LeadersCard
+            :title="$t('leaderboard.top')"
+            :leaders="$store.state.lb.leaders"
+          />
+        </v-col>
+      </v-row>
     </v-col>
-  <v-col> 
+    <v-col>
       <SimpleCard
         icon="mdi-thumb-up"
         :title="$t('leaderboard.most_games')"
@@ -51,7 +53,7 @@
         cardClass="mb-3"
         dense
       />
-      <SimpleCard 
+      <SimpleCard
         icon="mdi-thumb-down"
         :title="$t('leaderboard.fall')"
         :content="$store.state.lb.weekly.worst"
@@ -63,17 +65,16 @@
 </template>
 
 <script>
-import axios from "axios"
-import SimpleCard from '../components/leaderboard/SimpleCard' 
-import LeadersCard from '../components/leaderboard/LeadersCard' 
-import BigNumberCard from '../components/leaderboard/BigNumberCard' 
-
+import axios from "axios";
+import SimpleCard from "../components/leaderboard/SimpleCard";
+import LeadersCard from "../components/leaderboard/LeadersCard";
+import BigNumberCard from "../components/leaderboard/BigNumberCard";
 
 export default {
   name: "home",
   components: { SimpleCard, LeadersCard, BigNumberCard },
   created() {
-    this.$store.dispatch('fetchLeaderboard')
-  }
-}
+    this.$store.dispatch("fetchLeaderboard");
+  },
+};
 </script>

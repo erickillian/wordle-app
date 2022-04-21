@@ -42,9 +42,9 @@ export default {
   methods: {
     playerClick(player_id) {
       let url = `/players/${player_id}`
-      window.open(url, '_blank')
+      // window.open(url, '_blank')
       // To open same window:
-      // this.$router.push(url)
+      this.$router.push(url)
     }
   },
   computed: {

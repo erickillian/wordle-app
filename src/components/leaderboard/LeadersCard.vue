@@ -6,27 +6,27 @@
     </v-subheader>
     <v-list flat dense>
       <v-list-item-group>
-        <v-row dense
-          align="center" justify="center"
+        <v-row
+          dense
+          align="center"
+          justify="center"
           v-for="(leader, index) in leaders"
           :key="leader.id"
           @click="playerClick(leader.id)"
         >
           <v-col cols="12" md="9">
             <v-list-item>
-              <v-list-item-avatar>
-                #{{ index + 1 }}
-              </v-list-item-avatar>
-              <v-list-item-avatar  color="grey" class="ml-2 mr-0">
+              <v-list-item-avatar> #{{ index + 1 }} </v-list-item-avatar>
+              <v-list-item-avatar color="grey" class="ml-2 mr-0">
               </v-list-item-avatar>
               <v-list-item-content class="ml-2 text-center">
                 <v-list-item-title>
-                   <v-icon
+                  <v-icon
                     dense
                     v-if="index + 1 <= 3"
                     :class="$store.state.placeClasses[index + 1]"
                   >
-                      mdi-star-circle
+                    mdi-star-circle
                   </v-icon>
                   {{ leader.name }}
                 </v-list-item-title>
@@ -40,9 +40,7 @@
             </v-list-item>
           </v-col>
           <v-col cols="8" md="3" class="pr-4">
-            <v-sheet
-            :title="$t('player_card.chart.name')"
-            elevation="0">
+            <v-sheet :title="$t('player_card.chart.name')" elevation="0">
               <v-sparkline
                 :value="leader.rating_trend"
                 :smooth="25"
@@ -66,18 +64,19 @@
 export default {
   props: {
     title: String,
-    leaders: Array
+    leaders: Array,
   },
   data() {
     return {
-      gradient: ['#f72047', '#ffd200', '#1feaea']
-    }
+      gradient: ["#f72047", "#ffd200", "#1feaea"],
+    };
   },
   methods: {
     playerClick(player_id) {
-      let url = `/players/${player_id}`
-      window.open(url, '_blank')
-    }
-  }
-}
+      let url = `/players/${player_id}`;
+      // window.open(url, '_blank')
+      this.$router.push(url);
+    },
+  },
+};
 </script>

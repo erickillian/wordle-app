@@ -8,10 +8,6 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     isLoading: false,
-    hands: {
-      R: i18n.t('player_card.info.hand_right'),
-      L: i18n.t('player_card.info.hand_left')
-    },
     placeClasses: {
       1: "yellow--text text--accent-4",
       2: "blue-grey--text text--lighten-4",
@@ -28,9 +24,9 @@ export default new Vuex.Store({
         selectedId: -1,
         content: [],
         columns: [
-          {text: i18n.t("players_list.name_col"), value: "full_name", width: 180},
-          {text: i18n.t("players_list.rating_col"), value: 'rating', width: 100},
-          {text: i18n.t("players_list.city_col"), value: 'city', width: 80}
+          { text: i18n.t("players_list.name_col"), value: "full_name", width: 180 },
+          { text: i18n.t("players_list.rating_col"), value: 'rating', width: 100 },
+          { text: i18n.t("players_list.city_col"), value: 'city', width: 80 }
         ]
       },
       details: {
@@ -41,13 +37,13 @@ export default new Vuex.Store({
         matchHistory: null,
         matchHistoryColumns: [
           // {text: "id", value: "id"},
-          {text: i18n.t('player_card.history.cols.event_date'), value: "event_date", width: "10%"},
-          {text: i18n.t('player_card.history.cols.event_short_name'), value: "event_short_name", width: "10%"},
-          {text: i18n.t('player_card.history.cols.score'), value: "score", width: "4%"},
-          {text: i18n.t('player_card.history.cols.rating'), value: "rating", width: "2%"},
-          {text: i18n.t('player_card.history.cols.opponent_name'), value: "opponent_name", width: "10%"},
-          {text: i18n.t('player_card.history.cols.opponent_rating'), value: "opponent_rating", width: "1%"},
-          {text: i18n.t('player_card.history.cols.delta'), value: "delta", width: "1%"}
+          { text: i18n.t('player_card.history.cols.event_date'), value: "event_date", width: "10%" },
+          { text: i18n.t('player_card.history.cols.event_short_name'), value: "event_short_name", width: "10%" },
+          { text: i18n.t('player_card.history.cols.score'), value: "score", width: "4%" },
+          { text: i18n.t('player_card.history.cols.rating'), value: "rating", width: "2%" },
+          { text: i18n.t('player_card.history.cols.opponent_name'), value: "opponent_name", width: "10%" },
+          { text: i18n.t('player_card.history.cols.opponent_rating'), value: "opponent_rating", width: "1%" },
+          { text: i18n.t('player_card.history.cols.delta'), value: "delta", width: "1%" }
         ]
       }
     },
@@ -145,7 +141,7 @@ export default new Vuex.Store({
       }
 
       context.commit('SET_LOADING_STATUS', true)
-      
+
       axios.get(`/api/v1/player/details/${player_id}`).then((response) => {
 
         context.commit('SET_PLAYER_FOUND')
@@ -155,11 +151,11 @@ export default new Vuex.Store({
         axios.get(`/api/v1/player/stats/${player_id}`).then((response) => {
           context.commit('SET_PLAYER_STATS', response.data)
         })
-  
+
         axios.get(`/api/v1/history/rating/${player_id}`).then((response) => {
           context.commit('SET_PLAYER_RATING_HISTORY', response.data)
         })
-  
+
         axios.get(`/api/v1/history/match/${player_id}`).then((response) => {
           context.commit('SET_PLAYER_MATCH_HISTORY', response.data)
           context.commit('SET_LOADING_STATUS', false)
