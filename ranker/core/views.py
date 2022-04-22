@@ -6,12 +6,12 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from ranker.core.models import (
-    Player, Event
+    Player, Event, PlayerRating
 )
 from ranker.core.serializers import (
     PlayerSerializer,
     EventSerializer,
-    # RatingHistorySerializer,
+    RatingHistorySerializer,
     MatchHistorySerializer
 )
 from ranker.core.services import data
@@ -73,10 +73,14 @@ class PlayerRatingHistory(APIView):
     Player history rating for charts
     """
     def get(self, request, player_id):
-        return []
-        # history = RatingHistory.objects.filter(player_id=player_id).order_by('date')
-        # serializer = RatingHistorySerializer(history, many=True)
-        # return Response(serializer.data)
+        try:
+            player = PlayerRating.objects.get(pk=player_id)
+            serializer = RatingHistorySerializer(player.rating_history_days, many=True)
+            print(serializer.data)
+            return Response(serializer.data)
+        except PlayerRating.DoesNotExist:
+            response = Response(status=status.HTTP_404_NOT_FOUND)
+        return response
 
 
 class PlayerMatchHistory(APIView):

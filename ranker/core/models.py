@@ -199,6 +199,17 @@ class PlayerRating(models.Model):
             rating_history.append(rating_elem)
         return rating_history
 
+    @property
+    def rating_history_days(self):
+        """Returns a history report of your rating."""
+        rating_history = []
+
+        elo_rating = EloRating()
+        matches = Match.objects.all().order_by('datetime')
+        for match in matches:
+            elo_rating.update_ratings(match.winner, match.loser)
+            rating_history.append(RatingHistory(player=self.player, date=match.datetime.date(), rating=elo_rating.get_rating(self.player)))
+        return rating_history
 
     class Meta:
         db_table = 'player_rating'
@@ -213,3 +224,18 @@ class Event(models.Model):
         db_table = 'event'
         verbose_name = ('event')
         verbose_name_plural = ('events')
+
+
+class RatingHistory(models.Model):
+    player = models.ForeignKey(
+        'Player',
+        db_index=True,
+        verbose_name=('player'),
+        null=False,
+        on_delete=models.CASCADE
+    )
+    date = models.DateField(db_index=True, verbose_name=('date'), null=False)
+    rating = models.FloatField(null=False)
+
+    def __str__(self):
+        return "{0} {1}".format(self.player.full_name, self.date)
