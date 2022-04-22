@@ -118,19 +118,25 @@ def get_leaders(*, n_players: int = 5, rating_trend_days: int = 7) -> list:
     TODO: put this to ORM level (PostgreSQL Window Functions)
     """
     # leaders = Player.objects.order_by('-rating')[:n_players]
-    leaders_ratings = PlayerRating.objects.all().order_by('-rating')[:n_players]
-    print(leaders_ratings)
+    leaders = PlayerRating.objects.all().order_by('-rating')[:n_players]
 
     result = []
 
+    # print(pd.DataFrame(t.__dict__ for t in leaders_ratings)['rating'])
+
+    # latest_leader_ratings = (
+    #     pd.DataFrame(t.__dict__ for t in leaders_ratings)['rating']
+    #     .head(rating_trend_days)[::-1].to_dict()
+    # )
+
     # Combining Users with their latest ratings
-    for leader in leaders_ratings:
+    for leader in leaders:
 
         leader_dict = {
             'id': leader.player.id,
             'name': leader.player.full_name,
             'rating': leader.rating,
-            # 'rating_trend': latest_leader_ratings.get(leader.id, [])
+            'rating_trend': leader.rating_trend
         }
 
         result.append(leader_dict)
@@ -152,8 +158,6 @@ def get_maxes() -> dict:
     losses = matches.groupby('loser_id').size()
     ratings = ratings.set_index('player_id')['rating']
     total = wins.append(losses)
-
-    print(total)
 
     metrics = [
         ('games', total),

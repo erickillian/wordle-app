@@ -196,6 +196,12 @@ class PlayerRating(models.Model):
         return max_rating
 
     @property
+    def rating_trend(self):
+        rating_history_days = self.rating_history_days
+        values = [o.rating for o in rating_history_days[-5:]]
+        return values
+
+    @property
     def rating_history_report(self):
         """Returns a history report of your rating."""
         rating_history = []
@@ -246,7 +252,7 @@ class RatingHistory(models.Model):
         on_delete=models.CASCADE
     )
     date = models.DateField(db_index=True, verbose_name=('date'), null=False)
-    rating = models.FloatField(null=False)
+    rating = models.IntegerField(null=False)
 
     def __str__(self):
-        return "{0} {1}".format(self.player.full_name, self.date)
+        return "{0} {1} {2}".format(self.player.full_name, self.date, self.rating)
