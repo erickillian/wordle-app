@@ -47,29 +47,21 @@ def get_last_matches(*, player_id: int, n_matches: int) -> Match:
 
 def get_player_stats(*, player_id: int) -> dict:
 
-    # stats = {}
+    stats = {}
 
-    # wins = Match.objects.filter(winner_id=player_id)
-    # losses = Match.objects.filter(loser_id=player_id)
+    wins = Match.objects.filter(winner_id=player_id)
+    losses = Match.objects.filter(loser_id=player_id)
+    player_rating = PlayerRating.objects.get(pk=player_id)      
 
-    # best_rating = (
-    #     RatingHistory
-    #     .objects
-    #     .filter(player_id=player_id)
-    #     .order_by('-rating')
-    #     .values('rating', 'date')
-    #     .first()
-    # )
-
-    # stats['win_count'] = wins.count()
-    # stats['lose_count'] = losses.count()
-    # stats['total_games'] = stats['win_count'] + stats['lose_count']
-    # stats['best_rating'] = best_rating
+    stats['win_count'] = wins.count()
+    stats['lose_count'] = losses.count()
+    stats['total_games'] = stats['win_count'] + stats['lose_count']
+    stats['best_rating'] = ( player_rating.max_rating )
 
     # TODO: best/worst opponent, events frequency,
     # achievemets (medal places) and more
 
-    return [] # stats
+    return stats
 
 
 def get_changes_in_time(*, n_players: int = 5, n_days: int = 7, fmt: str = "%Y-%m-%d") -> dict:

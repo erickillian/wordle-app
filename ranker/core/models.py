@@ -5,7 +5,6 @@ from django.utils import timezone
 
 from django.contrib.auth.models import AbstractUser
 
-
 from ranker.core.rankings import EloRating
 import json
 
@@ -17,7 +16,6 @@ class User(AbstractUser):
 
     class Meta:
         db_table = 'user'
-
 
 class Player(models.Model):
     """Table for keeping player information."""
@@ -183,6 +181,19 @@ class PlayerRating(models.Model):
         """Return the win percentage."""
         win_percent = self.wins / self.games_played
         return win_percent
+
+    @property
+    def max_rating(self):
+        max_rating = self.rating
+        elo_rating = EloRating()
+        matches = Match.objects.all().order_by('datetime')
+        for match in matches:
+            elo_rating.update_ratings(match.winner, match.loser)
+            rating = elo_rating.get_rating(self.player)
+            if (rating > max_rating):
+                max_rating = rating
+
+        return max_rating
 
     @property
     def rating_history_report(self):

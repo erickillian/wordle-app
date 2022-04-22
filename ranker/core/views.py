@@ -34,8 +34,6 @@ class LeaderBoard(APIView):
         maxes = data.get_maxes()
         totals = data.get_totals()
 
-        print(maxes)
-
         return Response({
             'leaders': leaders,
             'weekly': [],
@@ -76,7 +74,6 @@ class PlayerRatingHistory(APIView):
         try:
             player = PlayerRating.objects.get(pk=player_id)
             serializer = RatingHistorySerializer(player.rating_history_days, many=True)
-            print(serializer.data)
             return Response(serializer.data)
         except PlayerRating.DoesNotExist:
             response = Response(status=status.HTTP_404_NOT_FOUND)
