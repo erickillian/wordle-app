@@ -96,7 +96,6 @@ class Match(models.Model):
         verbose_name = ('match')
         verbose_name_plural = ('matchs')
 
-
 class PlayerRating(models.Model):
     """Table for keeping track of a player's rating."""
     player = models.OneToOneField(Player, default=None, primary_key=True, on_delete=models.CASCADE)
@@ -185,6 +184,8 @@ class PlayerRating(models.Model):
     @property
     def max_rating(self):
         max_rating = self.rating
+        date = timezone.now()
+
         elo_rating = EloRating()
         matches = Match.objects.all().order_by('datetime')
         for match in matches:
@@ -192,29 +193,15 @@ class PlayerRating(models.Model):
             rating = elo_rating.get_rating(self.player)
             if (rating > max_rating):
                 max_rating = rating
+                date = match.date
 
-        return max_rating
+        return {'rating': max_rating, 'date': date}
 
     @property
     def rating_trend(self):
         rating_history_days = self.rating_history_days
         values = [o.rating for o in rating_history_days[-5:]]
         return values
-
-    @property
-    def rating_history_report(self):
-        """Returns a history report of your rating."""
-        rating_history = []
-
-        elo_rating = EloRating()
-        matches = Match.objects.all().order_by('datetime')
-        for match in matches:
-            elo_rating.update_ratings(match.winner, match.loser)
-            rating_elem = {}
-            rating_elem['x'] = match.datetime.timestamp()
-            rating_elem['y'] = elo_rating.get_rating(self.player)
-            rating_history.append(rating_elem)
-        return rating_history
 
     @property
     def rating_history_days(self):
@@ -225,6 +212,10 @@ class PlayerRating(models.Model):
         matches = Match.objects.all().order_by('datetime')
         for match in matches:
             elo_rating.update_ratings(match.winner, match.loser)
+            for rh_elem in rating_history: # Removes Rating history elements on the same day
+                if rh_elem.date == match.datetime.date():
+                    rating_history.remove(rh_elem)
+
             rating_history.append(RatingHistory(player=self.player, date=match.datetime.date(), rating=elo_rating.get_rating(self.player)))
         return rating_history
 

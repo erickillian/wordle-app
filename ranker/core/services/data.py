@@ -14,34 +14,30 @@ VALUE_LOSE = 0
 
 def get_last_matches(*, player_id: int, n_matches: int) -> Match:
 
-    # wins = Match.objects.filter(winner_id=player_id).values(
-    #     'id', 'event_date', 'delta',
-    #     event_short_name=F('event__short_name'),
-    #     opponent_name=Concat('loser__first_name', Value(' '), 'loser__last_name'),
-    #     rating=F('winner_rating'),
-    #     opponent_rating=F('loser_rating'),
-    #     result=Value(VALUE_WIN, IntegerField()),
-    #     score=Concat(
-    #         Cast('winner_score', CharField()),
-    #         Value(' - '),
-    #         Cast('loser_score', CharField())
-    #     )
-    # )
+    wins = Match.objects.filter(winner_id=player_id).values(
+        'id',
+        'datetime',
+        opponent_name=Concat('loser__first_name', Value(' '), 'loser__last_name'),
+        result=Value(VALUE_WIN, IntegerField()),
+        score=Concat(
+            Cast('winning_score', CharField()),
+            Value(' - '),
+            Cast('losing_score', CharField())
+        )
+    )
 
-    # losses = Match.objects.filter(loser_id=player_id).values(
-    #     'id', 'event_date', 'delta',
-    #     event_short_name=F('event__short_name'),
-    #     opponent_name=Concat('winner__first_name', Value(' '), 'winner__last_name'),
-    #     rating=F('loser_rating'),
-    #     opponent_rating=F('winner_rating'),
-    #     result=Value(VALUE_LOSE, IntegerField()),
-    #     score=Concat(
-    #         Cast('loser_score', CharField()),
-    #         Value(' - '),
-    #         Cast('winner_score', CharField())
-    #     )
-    # )
-    summary = [] # wins.union(losses).order_by('-id')[:n_matches]
+    losses = Match.objects.filter(loser_id=player_id).values(
+        'id',
+        'datetime',
+        opponent_name=Concat('winner__first_name', Value(' '), 'winner__last_name'),
+        result=Value(VALUE_LOSE, IntegerField()),
+        score=Concat(
+            Cast('losing_score', CharField()),
+            Value(' - '),
+            Cast('winning_score', CharField())
+        )
+    )
+    summary = wins.union(losses).order_by('-id')[:n_matches]
     return summary
 
 
@@ -122,13 +118,6 @@ def get_leaders(*, n_players: int = 5, rating_trend_days: int = 7) -> list:
 
     result = []
 
-    # print(pd.DataFrame(t.__dict__ for t in leaders_ratings)['rating'])
-
-    # latest_leader_ratings = (
-    #     pd.DataFrame(t.__dict__ for t in leaders_ratings)['rating']
-    #     .head(rating_trend_days)[::-1].to_dict()
-    # )
-
     # Combining Users with their latest ratings
     for leader in leaders:
 
@@ -140,8 +129,6 @@ def get_leaders(*, n_players: int = 5, rating_trend_days: int = 7) -> list:
         }
 
         result.append(leader_dict)
-
-    print(result)
 
     return result
 
@@ -157,12 +144,12 @@ def get_maxes() -> dict:
     wins = matches.groupby('winner_id').size()
     losses = matches.groupby('loser_id').size()
     ratings = ratings.set_index('player_id')['rating']
-    total = wins.append(losses)
+    total = wins.add(losses, fill_value=0)
 
     metrics = [
         ('games', total),
         ('winrate', wins / total),
-        ('efficiency', ratings / total)
+        ('efficiency', ratings / (total * 1000))
     ]
 
     result = {}
@@ -174,7 +161,7 @@ def get_maxes() -> dict:
             'name': Player.objects.get(pk=idx).full_name,
             'value': data[idx]
         }]
-
+        
     return result
 
 

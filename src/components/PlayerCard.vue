@@ -3,7 +3,7 @@
     <v-card-title>
       <div class="overline">{{ $t("player_card.name") }}</div>
     </v-card-title>
-    <v-card-title class="py-0">
+    <!-- <v-card-title class="py-0">
         <v-row>
           <v-col cols="4" md="2" class="text-center" justify="center">
             <v-avatar size="60">
@@ -31,7 +31,7 @@
             {{ playerInfo.date_of_birth | date }}
           </v-col>
         </v-row>
-      </v-card-title>
+      </v-card-title> -->
       <v-card-text>
       <v-row>
         <v-col style="overflow: auto">
@@ -82,7 +82,7 @@
                 :hide-default-footer="true"
                 class="elevation-0"
               >
-                <template v-slot:item.event_date="{ item }">
+                <!-- <template v-slot:item.event_date="{ item }">
                   {{ item.event_date | date}}
                 </template>
                 <template v-slot:item.score="{ item }">
@@ -90,7 +90,7 @@
                 </template>
                 <template v-slot:item.delta="{ item }">
                   <span :class="getDeltaClass(item)">{{ getDeltaValue(item) }}</span>
-                </template>
+                </template> -->
               </v-data-table>
             </v-tab-item>
           </v-tabs>
@@ -143,6 +143,13 @@ export default {
     },
     statItems () {
       return [
+        
+        
+        {
+          icon: "mdi-account-outline",
+          title: this.$t('player_card.info.fullname'),
+          subtitle: this.playerInfo.full_name
+        },
         { 
           icon: "mdi-chart-donut",
           title: `${this.$t('player_card.info.total_games')}: <b>${this.playerStats.total_games}</b>`,
@@ -151,27 +158,28 @@ export default {
                       ${this.$options.filters.percent(this.playerStats.win_count / this.playerStats.total_games, 2)}`
         },
         {
+          icon: "mdi-star",
+          title: `${this.$t('player_card.info.rating')}: <b>${this.$options.filters.round(
+            this.playerInfo.rating, 2
+          )}</b>`,
+        },
+        {
           icon: "mdi-summit",
           title: `${this.$t('player_card.info.best_rating')}: <b>${this.$options.filters.round(
             this.playerStats.best_rating.rating, 2
           )}</b>`,
           subtitle: this.$options.filters.date(this.playerStats.best_rating.date)
         },
-        {
-          icon: "mdi-account-outline",
-          title: this.$t('player_card.info.username'),
-          subtitle: this.playerInfo.username
-        },
-        {
-          icon: "mdi-hand",
-          title: this.$t('player_card.info.hand'),
-          subtitle: this.$store.state.hands[this.playerInfo.hand]
-        },
-        {
-          icon: "mdi-rocket",
-          title: this.$t('player_card.info.equipment'),
-          subtitle: this.playerInfo.equipment
-        }
+        // {
+        //   icon: "mdi-hand",
+        //   title: this.$t('player_card.info.hand'),
+        //   subtitle: this.$store.state.hands[this.playerInfo.hand]
+        // },
+        // {
+        //   icon: "mdi-rocket",
+        //   title: this.$t('player_card.info.equipment'),
+        //   subtitle: this.playerInfo.equipment
+        // }
       ]
 
     },

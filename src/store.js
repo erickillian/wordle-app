@@ -37,13 +37,9 @@ export default new Vuex.Store({
         matchHistory: null,
         matchHistoryColumns: [
           // {text: "id", value: "id"},
-          { text: i18n.t('player_card.history.cols.event_date'), value: "event_date", width: "10%" },
-          { text: i18n.t('player_card.history.cols.event_short_name'), value: "event_short_name", width: "10%" },
-          { text: i18n.t('player_card.history.cols.score'), value: "score", width: "4%" },
-          { text: i18n.t('player_card.history.cols.rating'), value: "rating", width: "2%" },
-          { text: i18n.t('player_card.history.cols.opponent_name'), value: "opponent_name", width: "10%" },
-          { text: i18n.t('player_card.history.cols.opponent_rating'), value: "opponent_rating", width: "1%" },
-          { text: i18n.t('player_card.history.cols.delta'), value: "delta", width: "1%" }
+          { text: i18n.t('player_card.history.cols.match_date'), value: "datetime", width: "34%" },
+          { text: i18n.t('player_card.history.cols.score'), value: "score", width: "33%" },
+          { text: i18n.t('player_card.history.cols.opponent_name'), value: "opponent_name", width: "33%" },
         ]
       }
     },

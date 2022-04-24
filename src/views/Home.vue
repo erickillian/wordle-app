@@ -44,7 +44,7 @@
         valueClass="green--text text--accent-4"
       />
     </v-col>
-    <v-col>
+    <!-- <v-col>
       <SimpleCard
         icon="mdi-thumb-up"
         :title="$t('leaderboard.rise')"
@@ -60,7 +60,7 @@
         valueClass="red--text text--accent-4"
         dense
       />
-    </v-col>
+    </v-col> -->
   </v-row>
 </template>
 

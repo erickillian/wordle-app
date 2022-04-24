@@ -32,7 +32,9 @@ export const ENGLISH_TRANSLATIONS = {
       "name": "Information",
       "total_games": "Games total",
       "best_rating": "Highest rating",
+      "rating": "Current Rating",
       "username": "Username",
+      "fullname": "Name",
       "hand": "Playing hand",
       "hand_right": "Right",
       "hand_left": "Left",
@@ -44,7 +46,7 @@ export const ENGLISH_TRANSLATIONS = {
     history: {
       "name": "Latest matches",
       cols: {
-        "event_date": "Date",
+        "match_date": "Date",
         "event_short_name": "Event",
         "score": "Score",
         "rating": "Rating",

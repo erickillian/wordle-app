@@ -43,20 +43,7 @@ class MatchSerializer(serializers.ModelSerializer):
 
 class MatchHistorySerializer(serializers.Serializer):
     id = serializers.IntegerField()
-    event_date = serializers.DateField()
-    delta = serializers.DecimalField(
-        max_digits=10,
-        decimal_places=2
-    )
-    event_short_name = serializers.CharField(max_length=30)
     opponent_name = serializers.CharField(max_length=80)
-    rating = serializers.DecimalField(
-        max_digits=10,
-        decimal_places=2
-    )
-    opponent_rating = serializers.DecimalField(
-        max_digits=10,
-        decimal_places=2
-    )
     score = serializers.CharField(max_length=5)
     result = serializers.IntegerField()
+    datetime = serializers.DateTimeField()

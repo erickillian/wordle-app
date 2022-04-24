@@ -16,9 +16,6 @@
         >
           <v-col cols="12" md="9">
             <v-list-item>
-              <v-list-item-avatar> #{{ index + 1 }} </v-list-item-avatar>
-              <v-list-item-avatar color="grey" class="ml-2 mr-0">
-              </v-list-item-avatar>
               <v-list-item-content class="ml-2 text-center">
                 <v-list-item-title>
                   <v-icon
@@ -30,7 +27,6 @@
                   </v-icon>
                   {{ leader.name }}
                 </v-list-item-title>
-                <v-list-item-subtitle>{{ leader.city }}</v-list-item-subtitle>
               </v-list-item-content>
               <v-list-item-content class="subtitle-1 text-center">
                 <v-list-item-title :title="$t('player_card.rating')">
@@ -39,14 +35,14 @@
               </v-list-item-content>
             </v-list-item>
           </v-col>
-          <v-col cols="8" md="3" class="pr-4">
+          <v-col cols="6" md="3" class="pr-5">
             <v-sheet :title="$t('player_card.chart.name')" elevation="0">
               <v-sparkline
                 :value="leader.rating_trend"
                 :smooth="25"
-                :padding="8"
+                :padding="10"
                 :gradient="gradient"
-                :line-width="4"
+                :line-width="6"
                 :auto-line-width="true"
                 :auto-draw-duration="1000"
                 :auto-draw="true"

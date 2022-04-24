@@ -8,11 +8,11 @@
     :clipped-left="true"
   >
     <img
-      style="max-width: 32px; max-height: 32px"
+      style="max-width: 40px; max-height: 40px"
       class="mr-3"
       src="/static/logo.png"
     />
-    <v-toolbar-title>RANKER</v-toolbar-title>
+    <v-toolbar-title>Converge General Sports Ranker</v-toolbar-title>
 
     <v-spacer></v-spacer>
 
@@ -63,12 +63,7 @@ export default {
       menu: [
         {name: this.$t("nav.main"), icon: "mdi-home-outline", to: "/"},
         {name: this.$t("nav.players"), icon: "mdi-account", to: "/players"},
-        {name: this.$t("nav.events"), icon: "mdi-bank", to: "/events"},
-        {
-          name: this.$t("nav.link"),
-          icon: "mdi-link",
-          href: "https://tv.ittf.com/",
-          target: "_blank"}
+        // {name: this.$t("nav.events"), icon: "mdi-bank", to: "/events"},
       ]
     }
   }
