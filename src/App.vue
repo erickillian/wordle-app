@@ -9,6 +9,7 @@
 <script>
 import MainLayout from "@/layouts/MainLayout";
 import EmptyLayout from "@/layouts/EmptyLayout";
+import { mapGetters } from 'vuex';
 
 
 export default {
@@ -17,7 +18,10 @@ export default {
   computed: {
     layout() {
       return this.$route.meta.layout;
-    }
+    },
+    ...mapGetters('auth', [
+      'isAuthenticated',
+    ]),
   }
 };
 </script>
