@@ -9,21 +9,14 @@ from ranker.core.rankings import EloRating
 import json
 
 
-class User(AbstractUser):
-    # phone = models.CharField(
-    #     verbose_name=_('phone number'), max_length=40, null=True, blank=True
-    # )
-
-    class Meta:
-        db_table = 'user'
-
-class Player(models.Model):
+class Player(AbstractUser):
     """Table for keeping player information."""
     first_name = models.CharField(max_length=50, blank=False)
     last_name = models.CharField(max_length=50, blank=False)
 
     class Meta:
         unique_together = ('first_name', 'last_name',)
+        db_table = 'user'
 
     def __str__(self):
         """Display player's full name as string object representation."""
@@ -95,6 +88,14 @@ class Match(models.Model):
         db_table = 'match'
         verbose_name = ('match')
         verbose_name_plural = ('matchs')
+
+
+# class Game(models.Model):
+#     name = models.CharField(max_length=60, blank=False)
+#     # Points it takes to win the game
+#     winning_points = models.PositiveIntegerField(blank=False, default=11)
+#     # Points ahead you have to be to win
+#     winning_point_differential = models.PositiveIntegerField(blank=False, default=0)
 
 class PlayerRating(models.Model):
     """Table for keeping track of a player's rating."""
@@ -233,7 +234,7 @@ class Event(models.Model):
         verbose_name = ('event')
         verbose_name_plural = ('events')
 
-
+# Only used to generate rating history reports, not populated in database
 class RatingHistory(models.Model):
     player = models.ForeignKey(
         'Player',

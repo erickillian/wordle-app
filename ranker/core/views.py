@@ -76,8 +76,7 @@ class PlayerRatingHistory(APIView):
             serializer = RatingHistorySerializer(player.rating_history_days, many=True)
             return Response(serializer.data)
         except PlayerRating.DoesNotExist:
-            response = Response(status=status.HTTP_404_NOT_FOUND)
-        return response
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 class PlayerMatchHistory(APIView):
@@ -95,8 +94,11 @@ class PlayerStats(APIView):
     Simple player statistics
     """
     def get(self, request, player_id):
-        stats = data.get_player_stats(player_id=player_id)
-        return Response(stats)
+        try:
+            stats = data.get_player_stats(player_id=player_id)
+            return Response(stats)
+        except PlayerRating.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 class EventList(APIView):

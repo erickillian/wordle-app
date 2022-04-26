@@ -1,11 +1,22 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from "axios"
-import i18n from './i18n'
+import i18n from '../i18n'
+
+import session from '../api/session';
+import auth from './auth';
+import password from './password';
+import signup from './signup';
+
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
+  modules: {
+    auth,
+    password,
+    signup,
+  },
   state: {
     isLoading: false,
     placeClasses: {
@@ -36,7 +47,7 @@ export default new Vuex.Store({
         ratingHistory: null,
         matchHistory: null,
         matchHistoryColumns: [
-          // {text: "id", value: "id"},
+          {text: "id", value: "id"},
           { text: i18n.t('player_card.history.cols.match_date'), value: "datetime", width: "34%" },
           { text: i18n.t('player_card.history.cols.score'), value: "score", width: "33%" },
           { text: i18n.t('player_card.history.cols.opponent_name'), value: "opponent_name", width: "33%" },

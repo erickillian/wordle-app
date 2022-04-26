@@ -38,7 +38,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'ranker.core'
+    'rest_framework.authtoken',
+    'ranker.core',
+    'allauth',
+    'allauth.account',
+    'dj_rest_auth.registration',
 ]
 
 MIDDLEWARE = [
@@ -52,6 +56,13 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# REST_FRAMEWORK = {
+#     'DEFAULT_AUTHENTICATION_CLASSES': [
+#         'rest_framework.authentication.BasicAuthentication',
+#         'rest_framework.authentication.SessionAuthentication',
+#     ]
+# }
 
 ROOT_URLCONF = 'ranker.urls'
 
@@ -72,6 +83,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'ranker.wsgi.application'
+
+LOGIN_REDIRECT_URL = '/'
 
 
 # Database
@@ -126,8 +139,7 @@ USE_TZ = False
 # ]
 
 # Extendable user model
-AUTH_USER_MODEL = 'core.User'
-
+AUTH_USER_MODEL = 'core.Player'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/

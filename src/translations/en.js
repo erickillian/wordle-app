@@ -11,6 +11,8 @@ export const ENGLISH_TRANSLATIONS = {
   nav: {
     "main": "Home",
     "players": "Players",
+    "login": "Login",
+    "logout": "Logout",
     "events": "Events",
     "link": "ITTF"
   },

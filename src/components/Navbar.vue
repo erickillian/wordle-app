@@ -12,7 +12,7 @@
       class="mr-3"
       src="/static/logo.png"
     />
-    <v-toolbar-title>Converge General Sports Ranker</v-toolbar-title>
+    <v-toolbar-title>Converge General Games Ranker</v-toolbar-title>
 
     <v-spacer></v-spacer>
 
@@ -63,6 +63,7 @@ export default {
       menu: [
         {name: this.$t("nav.main"), icon: "mdi-home-outline", to: "/"},
         {name: this.$t("nav.players"), icon: "mdi-account", to: "/players"},
+        {name: this.$t("nav.logout"), icon: "mdi-login", to: "/logout"},
         // {name: this.$t("nav.events"), icon: "mdi-bank", to: "/events"},
       ]
     }
