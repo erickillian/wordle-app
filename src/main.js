@@ -31,6 +31,7 @@ new Vue({
   store,
   i18n,
   vuetify: new Vuetify({
+    theme: { dark: true },
     lang: {
       locales: { en, ru },
       current: LOCALE,

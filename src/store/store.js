@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import axios from "axios"
+// import session from "session"
 import i18n from '../i18n'
 
 import session from '../api/session';
@@ -47,10 +47,10 @@ export default new Vuex.Store({
         ratingHistory: null,
         matchHistory: null,
         matchHistoryColumns: [
-          {text: "id", value: "id"},
-          { text: i18n.t('player_card.history.cols.match_date'), value: "datetime", width: "34%" },
-          { text: i18n.t('player_card.history.cols.score'), value: "score", width: "33%" },
-          { text: i18n.t('player_card.history.cols.opponent_name'), value: "opponent_name", width: "33%" },
+          {text: i18n.t('player_card.history.cols.id'), value: "id", width: "10%"},
+          { text: i18n.t('player_card.history.cols.match_date'), value: "datetime", width: "30%" },
+          { text: i18n.t('player_card.history.cols.score'), value: "score", width: "30%" },
+          { text: i18n.t('player_card.history.cols.opponent_name'), value: "opponent_name", width: "30%" },
         ]
       }
     },
@@ -117,7 +117,7 @@ export default new Vuex.Store({
   actions: {
     fetchLeaderboard(context) {
       context.commit('SET_LOADING_STATUS', true)
-      axios.get('/api/v1/players/leaderboard').then((response) => {
+      session.get('/api/v1/players/leaderboard').then((response) => {
         context.commit('SET_LB_WEEKLY', response.data.weekly)
         context.commit('SET_LB_LEADERS', response.data.leaders)
         context.commit('SET_LB_MAXES', response.data.maxes)
@@ -127,7 +127,7 @@ export default new Vuex.Store({
     },
     fetchPlayers(context) {
       context.commit('SET_LOADING_STATUS', true)
-      axios.get('/api/v1/players/all').then((response) => {
+      session.get('/api/v1/players/all').then((response) => {
         context.commit('SET_PLAYER_LIST', response.data)
         context.commit('SET_LOADING_STATUS', false)
       })
@@ -149,21 +149,21 @@ export default new Vuex.Store({
 
       context.commit('SET_LOADING_STATUS', true)
 
-      axios.get(`/api/v1/player/details/${player_id}`).then((response) => {
+      session.get(`/api/v1/player/details/${player_id}`).then((response) => {
 
         context.commit('SET_PLAYER_FOUND')
         context.commit('SET_PLAYER_INFO', response.data)
 
         // fetch other data if player is found
-        axios.get(`/api/v1/player/stats/${player_id}`).then((response) => {
+        session.get(`/api/v1/player/stats/${player_id}`).then((response) => {
           context.commit('SET_PLAYER_STATS', response.data)
         })
 
-        axios.get(`/api/v1/history/rating/${player_id}`).then((response) => {
+        session.get(`/api/v1/history/rating/${player_id}`).then((response) => {
           context.commit('SET_PLAYER_RATING_HISTORY', response.data)
         })
 
-        axios.get(`/api/v1/history/match/${player_id}`).then((response) => {
+        session.get(`/api/v1/history/match/${player_id}`).then((response) => {
           context.commit('SET_PLAYER_MATCH_HISTORY', response.data)
           context.commit('SET_LOADING_STATUS', false)
         })
@@ -184,14 +184,14 @@ export default new Vuex.Store({
     },
     fetchEvents(context) {
       context.commit('SET_LOADING_STATUS', true)
-      axios.get('/api/v1/events/all').then((response) => {
+      session.get('/api/v1/events/all').then((response) => {
         context.commit('SET_EVENTS_LIST', response.data)
         context.commit('SET_LOADING_STATUS', false)
       })
     },
     fetchEventDetails(context, event_id) {
       context.commit('SET_LOADING_STATUS', true)
-      axios.get(`/api/v1/event/details/${event_id}`).then((response) => {
+      session.get(`/api/v1/event/details/${event_id}`).then((response) => {
         context.commit('SET_EVENT_DETAILS', response.data)
         context.commit('SET_LOADING_STATUS', false)
       })

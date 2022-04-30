@@ -26,6 +26,9 @@
         <v-icon :left="true">{{ item.icon }}</v-icon>
         {{ item.name }}
       </v-btn>
+      <!-- <v-icon class="mr-1">mdi-moon-waxing-crescent
+      </v-icon>
+      <v-switch inset v-model="$vuetify.theme.dark" /> -->
     </v-toolbar-items>
     <div class="hidden-md-and-up">
       <v-menu>
@@ -35,6 +38,7 @@
           </v-btn>
         </template>
         <v-list>
+          <v-item-group>
           <v-list-item v-for="item in menu" :key="item.icon">
             <v-btn text 
               :to="item.to"
@@ -44,10 +48,17 @@
               <v-icon :left="true">{{ item.icon }}</v-icon>
               {{ item.name }}
             </v-btn>
-          </v-list-item>   
+          </v-list-item> 
+          <!-- <v-list-item>
+            <v-icon class="mr-1">mdi-moon-waxing-crescent</v-icon>
+            <v-switch inset v-model="$vuetify.theme.dark" />
+          </v-list-item> -->
+          </v-item-group>
         </v-list>
+        
       </v-menu>
     </div>
+    
     <v-progress-linear
       :active="$store.state.isLoading"
       :indeterminate="true"

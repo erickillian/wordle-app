@@ -49,6 +49,7 @@ export const ENGLISH_TRANSLATIONS = {
       "name": "Latest matches",
       cols: {
         "match_date": "Date",
+        "id": "Id",
         "event_short_name": "Event",
         "score": "Score",
         "rating": "Rating",

@@ -1,18 +1,51 @@
 <template>
-  <div id="login-view">
-    <h1>Login</h1>
-    <form @submit.prevent="submit">
-      <input v-model="inputs.username" type="text" id="username" placeholder="username">
-      <input v-model="inputs.password" type="password" id="password" placeholder="password">
-    </form>
-    <button @click="login(inputs)" id="login-button">
-      login
-    </button>
-    <div>
-      <router-link to="/register">create account</router-link> |
-      <router-link to="/password_reset">reset password</router-link>
-    </div>
-  </div>
+   <v-app id="login-view">
+      <v-content>
+         <v-container fluid fill-height>
+            <v-layout align-center justify-center>
+               <v-flex xs12 sm8 md4>
+                  <v-card class="elevation-12">
+                     <v-toolbar dark color="primary">
+                        <v-toolbar-title>Login</v-toolbar-title>
+                     </v-toolbar>
+                     <v-card-text>
+                        <v-form @submit.prevent="submit">
+                           <v-text-field
+                              prepend-icon=mdi-account
+                              name="login"
+                              label="Login"
+                              type="username"
+                              placeholder="username"
+                              v-model="inputs.username"
+                           ></v-text-field>
+                           <v-text-field
+                              id="password"
+                              prepend-icon=mdi-lock
+                              name="password"
+                              label="Password"
+                              type="password"
+                              placeholder="password"
+                              v-model="inputs.password"
+                           ></v-text-field>
+                           <v-btn
+                              type="submit"
+                              color="primary"
+                              class="mr-4"
+                              @click="login(inputs)"
+                              @submit="login(inputs)"
+                            >
+                              Login
+                            </v-btn>
+                        </v-form>
+                     </v-card-text>
+                      <router-link to="/register">create account</router-link> |
+                      <router-link to="/password_reset">reset password</router-link>
+                  </v-card>
+               </v-flex>
+            </v-layout>
+         </v-container>
+      </v-content>
+   </v-app>
 </template>
 
 <script>
@@ -37,5 +70,6 @@ export default {
 <style>
 form input {
   display: block
+
 }
 </style>
