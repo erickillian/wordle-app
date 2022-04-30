@@ -37,7 +37,6 @@ export default new Vuex.Store({
         columns: [
           { text: i18n.t("players_list.name_col"), value: "full_name", width: 180 },
           { text: i18n.t("players_list.rating_col"), value: 'rating', width: 100 },
-          { text: i18n.t("players_list.city_col"), value: 'city', width: 80 }
         ]
       },
       details: {

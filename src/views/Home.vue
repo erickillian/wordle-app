@@ -1,7 +1,7 @@
 <template>
   <v-row class="ma-0" style="height: 100%">
     <v-col>
-      <v-row>
+      <v-row class="mb-3">
         <v-col
           class="pt-0"
           v-for="total in $store.state.lb.totals"

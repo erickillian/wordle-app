@@ -1,4 +1,4 @@
-<template>
+<!--template>
   <div id="register-view">
     <h1>Create Account</h1>
     <template v-if="registrationLoading">
@@ -34,6 +34,83 @@
       </div>
     </template>
   </div>
+</template-->
+<template>
+   <v-app id="login-view">
+      <v-content>
+         <v-container fluid fill-height>
+            <v-layout align-center justify-center>
+               <v-flex xs12 sm8 md4>
+                  <v-card class="elevation-12">
+                     <v-toolbar dark color="primary">
+                        <v-toolbar-title>Create Account</v-toolbar-title>
+                     </v-toolbar>
+                     <v-card-text>
+                        <v-form @submit.prevent="submit">
+                           <v-text-field
+                              prepend-icon=mdi-account
+                              name="Username"
+                              label="Username"
+                              type="username"
+                              placeholder="username"
+                              v-model="inputs.username"
+                           ></v-text-field>
+                           <v-text-field
+                              prepend-icon=mdi-account
+                              name="First Name"
+                              label="First Name"
+                              type="username"
+                              placeholder="firstname"
+                              v-model="inputs.firstname"
+                           ></v-text-field>
+                           <v-text-field
+                              prepend-icon=mdi-account
+                              name="Last Name"
+                              label="Last Name"
+                              type="username"
+                              placeholder="lastname"
+                              v-model="inputs.lastname"
+                           ></v-text-field>
+                           <v-text-field
+                              id="email"
+                              prepend-icon=mdi-email
+                              name="email"
+                              label="Email"
+                              type="email"
+                              placeholder="email"
+                              v-model="inputs.email"
+                           ></v-text-field>
+                           <v-text-field
+                              id="password2"
+                              prepend-icon=mdi-lock
+                              name="password2"
+                              label="Validate Password"
+                              type="password"
+                              placeholder="re-type password"
+                              v-model="inputs.password2"
+                           ></v-text-field>
+                           <v-btn
+                              type="submit"
+                              color="primary"
+                              class="mr-4"
+                              @click="createAccount(inputs)"
+                              @submit="createAccount(inputs)"
+                            >
+                              Create Account
+                            </v-btn>
+                        </v-form>
+                     </v-card-text>
+                     <!-- <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn @submit="login(inputs)" @click="login(inputs)" color="primary" to="/">Login</v-btn>
+                     </v-card-actions> -->
+                      <router-link to="/login">return to login page</router-link>
+                  </v-card>
+               </v-flex>
+            </v-layout>
+         </v-container>
+      </v-content>
+   </v-app>
 </template>
 
 <script>
@@ -42,6 +119,8 @@ export default {
   data() {
     return {
       inputs: {
+        firstname: '',
+        lastname: '',
         username: '',
         password1: '',
         password2: '',

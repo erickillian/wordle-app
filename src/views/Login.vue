@@ -38,6 +38,10 @@
                             </v-btn>
                         </v-form>
                      </v-card-text>
+                     <!-- <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn @submit="login(inputs)" @click="login(inputs)" color="primary" to="/">Login</v-btn>
+                     </v-card-actions> -->
                       <router-link to="/register">create account</router-link> |
                       <router-link to="/password_reset">reset password</router-link>
                   </v-card>

@@ -97,10 +97,18 @@ class Match(models.Model):
 #     # Points ahead you have to be to win
 #     winning_point_differential = models.PositiveIntegerField(blank=False, default=0)
 
+# class ConvergeleDailyScore(models.Model):
+#     player = models.OneToOneField(Player, default=None, primary_key=True, on_delete=models.CASCADE)
+#     date = models.DateField(unique=True)
+    
+
+
+
 class PlayerRating(models.Model):
     """Table for keeping track of a player's rating."""
     player = models.OneToOneField(Player, default=None, primary_key=True, on_delete=models.CASCADE)
     rating = models.IntegerField(default=None, blank=False)
+    # game = models.ManyToOneField(Player, blank=False, default=None, primary_key=True, on_delete=models.CASCADE)
     
     @staticmethod
     def add_ratings(elo_rating: EloRating):
