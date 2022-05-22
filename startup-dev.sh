@@ -1,4 +1,4 @@
-# npm run build
+npm run build
 python3 manage.py collectstatic --noinput
 python3 manage.py makemigrations core
 python3 manage.py migrate core
