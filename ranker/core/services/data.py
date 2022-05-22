@@ -17,7 +17,7 @@ def get_last_matches(*, player_id: int, n_matches: int) -> Match:
     wins = Match.objects.filter(winner_id=player_id).values(
         'id',
         'datetime',
-        opponent_name=Concat('loser__first_name', Value(' '), 'loser__last_name'),
+        opponent_name=Concat('loser__firstname', Value(' '), 'loser__lastname'),
         result=Value(VALUE_WIN, IntegerField()),
         score=Concat(
             Cast('winning_score', CharField()),
@@ -29,7 +29,7 @@ def get_last_matches(*, player_id: int, n_matches: int) -> Match:
     losses = Match.objects.filter(loser_id=player_id).values(
         'id',
         'datetime',
-        opponent_name=Concat('winner__first_name', Value(' '), 'winner__last_name'),
+        opponent_name=Concat('winner__firstname', Value(' '), 'winner__lastname'),
         result=Value(VALUE_LOSE, IntegerField()),
         score=Concat(
             Cast('losing_score', CharField()),
@@ -78,7 +78,7 @@ def get_changes_in_time(*, n_players: int = 5, n_days: int = 7, fmt: str = "%Y-%
     #         SELECT
     #             p1.id,
     #             p1.player_id,
-    #             p3.last_name || ' ' || p3.first_name as full_name,
+    #             p3.lastname || ' ' || p3.firstname as full_name,
     #             p3.rating - p1.rating as rating_delta
     #         FROM ratinghistory p1, (
     #             SELECT player_id, MAX(date) AS max_date

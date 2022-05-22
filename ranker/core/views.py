@@ -1,6 +1,7 @@
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 
 from rest_framework.views import APIView
@@ -29,7 +30,8 @@ class LeaderBoard(APIView):
     Get data for leaderboard. Data is cached for LB_CACHE_MINUTES
     minutes. Set it to 0 if you dont need any caching
     """
-    permission_classes = [ IsAuthenticated, ]
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated]
 
     @method_decorator(cache_page(LB_CACHE_MINUTES * 60, cache='leaderboard', key_prefix=''))
     def get(self, request):
@@ -50,7 +52,8 @@ class PlayerList(APIView):
     """
     List of all players
     """
-    permission_classes = [ IsAuthenticated, ]
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         players = Player.objects.all()
@@ -62,7 +65,8 @@ class PlayerDetail(APIView):
     """
     Player data
     """
-    permission_classes = [ IsAuthenticated, ]
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, player_id):
         try:
@@ -78,7 +82,8 @@ class PlayerRatingHistory(APIView):
     """
     Player history rating for charts
     """
-    permission_classes = [ IsAuthenticated, ]
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, player_id):
         try:
@@ -93,7 +98,8 @@ class PlayerMatchHistory(APIView):
     """
     Player match history
     """
-    permission_classes = [ IsAuthenticated, ]
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, player_id):
         summary = data.get_last_matches(player_id=player_id, n_matches=N_LAST_MATCHES)
@@ -105,7 +111,8 @@ class PlayerStats(APIView):
     """
     Simple player statistics
     """
-    permission_classes = [ IsAuthenticated, ]
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, player_id):
         try:
@@ -119,7 +126,8 @@ class EventList(APIView):
     """
     List of all events
     """
-    permission_classes = [ IsAuthenticated, ]
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         events = Event.objects.all()
@@ -131,7 +139,8 @@ class EventDetail(APIView):
     """
     Detailed event information
     """
-    permission_classes = [ IsAuthenticated, ]
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def get(self, response, event_id):
         try:

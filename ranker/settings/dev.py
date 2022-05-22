@@ -23,10 +23,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(SETTINGS_DIR))
 SECRET_KEY = 'development_secret_key'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['*']
-
+# CORS_EXPOSE_HEADERS = ['Content-Type', 'X-CSRFToken']
+# CORS_ALLOW_CREDENTIALS = True
 
 # Application definition
 
@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
+    'corsheaders',
     'ranker.core',
     'allauth',
     'allauth.account',
@@ -55,13 +56,17 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
 
 REST_FRAMEWORK = {
+    'DEFAULT_PERMISSIONS_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.BasicAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-    ]
+        'rest_framework.authentication.SessionAuthentication'
+    ],
 }
 
 ROOT_URLCONF = 'ranker.urls'
@@ -86,6 +91,55 @@ WSGI_APPLICATION = 'ranker.wsgi.application'
 
 LOGIN_REDIRECT_URL = '/'
 
+ALLOWED_HOSTS = [
+    'localhost',
+    'localhost:8080',
+    # 'localhost:8080',
+    # '127.0.0.1',
+    # '127.0.0.1:8000',
+    # '127.0.0.1:8080',
+    # '0.0.0.0'
+    # '0.0.0.0:8000',
+    # '0.0.0.0:8080',
+]
+
+ALLOWED_HOSTS = ['*']
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
+CORS_EXPOSE_HEADERS = (
+    'Access-Control-Allow-Origin: *',
+)
+
+# CORS_EXPOSE_HEADERS = ['Content-Type', 'X-CSRFToken']
+# CORS_ORIGIN_ALLOW_ALL = True
+
+# CORS_ORIGIN_WHITELIST = (
+#     'http://localhost:8000',  # Django default port = 8000
+#     'http://localhost:8080',  # Vue port for frontend dev = 8080
+# )
+
+# CSRF_TRUSTED_ORIGINS = [
+#     'localhost',
+#     'localhost:8000',
+#     'localhost:8080',
+#     '127.0.0.1',
+#     '127.0.0.1:8000',
+#     '0.0.0.0'
+#     '0.0.0.0:8000',
+# ]
+
+# CORS_ALLOWED_ORIGINS = [
+#     'localhost',
+#     'localhost:8000',
+#     'localhost:8080',
+#     '127.0.0.1',
+#     '127.0.0.1:8000',
+#     '0.0.0.0'
+#     '0.0.0.0:8000',
+# ]
+
+
+
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
@@ -95,8 +149,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'ranker',
         'USER': 'ranker',
-        'PASSWORD': 'ranker',
-        'HOST': 'localhost',
+        'PASSWORD': 'password',
+        'HOST': 'db',
         'PORT': '5432'
     }
 }
