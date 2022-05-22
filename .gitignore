@@ -6,6 +6,7 @@ env
 db.sqlite3
 *.pyc
 *.ipynb
+staticfiles
 
 .DS_Store
 node_modules

@@ -2,21 +2,82 @@ from django.db import models
 from django.db.models import Sum
 from django.db.models.functions import Coalesce
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
 from ranker.core.rankings import EloRating
 import json
 
+class CustomAccountManager(BaseUserManager):
 
-class Player(AbstractUser):
+    def create_user(self, email, username, firstname, lastname, password, **other_fields):
+        """
+        Creates and saves a user with the given info.
+        """
+
+        if not email:
+            raise ValueError(_('You must provide an email address'))
+
+        if not username:
+            raise ValueError(_('You must provide an user name'))
+
+        email = self.normalize_email(email)
+        user = self.model(email=email, username=username,
+                          firstname=firstname, lastname=lastname, **other_fields)
+
+        user.set_password(password)
+        user.save()
+        return user
+
+    def create_superuser(self, email, username, firstname, lastname, password, **other_fields):
+        """
+        Creates and saves a superuser with the given info.
+        """
+
+        other_fields.setdefault('is_staff', True)
+        other_fields.setdefault('is_superuser', True)
+        other_fields.setdefault('is_active', True)
+
+        if other_fields.get('is_staff') != True:
+            raise ValueError(
+                'Superuser must be assigned to is_staff=True.'
+            )
+        if other_fields.get('is_superuser') != True:
+            raise ValueError(
+                'Superuser must be assigned to is_superuser=True.'
+            )
+
+        return self.create_user(email, username, firstname, lastname, password, **other_fields)
+
+    def create_user(self, email, username, firstname, lastname, password, **other_fields):
+        if not email:
+            raise ValueError(_('You must provide an email address'))
+
+        if not username:
+            raise ValueError(_('You must provide an user name'))
+
+        email = self.normalize_email(email)
+        user = self.model(email=email, username=username,
+                          firstname=firstname, lastname=lastname, **other_fields)
+
+        user.set_password(password)
+        user.save()
+        return user
+
+class Player(AbstractBaseUser, PermissionsMixin):
     """Table for keeping player information."""
-    first_name = models.CharField(max_length=50, blank=False)
-    last_name = models.CharField(max_length=50, blank=False)
+    email = models.EmailField(_('email address'), unique=True)
+    username = models.CharField(max_length=150, unique=True)
+    firstname = models.CharField(max_length=150, blank=True)
+    lastname = models.CharField(max_length=150, blank=True)
+    is_staff = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
 
-    class Meta:
-        unique_together = ('first_name', 'last_name',)
-        db_table = 'user'
+    objects = CustomAccountManager()
+
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['email', 'firstname', 'lastname']
 
     def __str__(self):
         """Display player's full name as string object representation."""
@@ -25,7 +86,7 @@ class Player(AbstractUser):
     @property
     def full_name(self):
         """The players full name, first plus last name."""
-        full_name = f'{self.first_name} {self.last_name}'
+        full_name = f'{self.firstname} {self.lastname}'
         return full_name
 
     class Meta:
