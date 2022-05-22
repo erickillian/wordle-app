@@ -7,7 +7,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN apt update && apt install -y npm python3 python3-pip
 
 # makes sure npm is up to date
-RUN npm i npm@latest
+# RUN npm i npm@latest
 
 # Sets the working directory to /code in the docker ubuntu image
 WORKDIR /code
@@ -19,7 +19,7 @@ COPY package.json /code
 COPY package-lock.json /code
 
 # install npm project dependencies
-RUN npm install
+RUN npm install .
 
 COPY requirements.txt /code
 
