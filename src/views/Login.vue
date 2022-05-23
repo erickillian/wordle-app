@@ -17,6 +17,7 @@
                               type="username"
                               placeholder="username"
                               v-model="inputs.username"
+                              :error-messages="$store.state.auth.login_error.username"
                            ></v-text-field>
                            <v-text-field
                               id="password"
@@ -26,6 +27,7 @@
                               type="password"
                               placeholder="password"
                               v-model="inputs.password"
+                              :error-messages="$store.state.auth.login_error.password"
                            ></v-text-field>
                            <v-btn
                               type="submit"
@@ -33,6 +35,7 @@
                               class="mr-4"
                               @click="login(inputs)"
                               @submit="login(inputs)"
+                              :loading=$store.state.auth.authenticating
                             >
                               Login
                             </v-btn>

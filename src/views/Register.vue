@@ -54,6 +54,7 @@
                               type="username"
                               placeholder="username"
                               v-model="inputs.username"
+                              :error-messages="$store.state.auth.registration_error.username"
                            ></v-text-field>
                            <v-text-field
                               prepend-icon=mdi-account
@@ -62,6 +63,7 @@
                               type="username"
                               placeholder="firstname"
                               v-model="inputs.firstname"
+                              :error-messages="$store.state.auth.registration_error.firstname"
                            ></v-text-field>
                            <v-text-field
                               prepend-icon=mdi-account
@@ -70,6 +72,7 @@
                               type="username"
                               placeholder="lastname"
                               v-model="inputs.lastname"
+                              :error-messages="$store.state.auth.registration_error.lastname"
                            ></v-text-field>
                            <v-text-field
                               id="email"
@@ -79,6 +82,7 @@
                               type="email"
                               placeholder="email"
                               v-model="inputs.email"
+                              :error-messages="$store.state.auth.registration_error.email"
                            ></v-text-field>
                            <v-text-field
                               id="password"
@@ -87,7 +91,8 @@
                               label="Password"
                               type="password"
                               placeholder="password"
-                              v-model="inputs.password"
+                              v-model="inputs.password1"
+                              :error-messages="$store.state.auth.registration_error.password1"
                            ></v-text-field>
                            <v-text-field
                               id="password2"
@@ -97,13 +102,14 @@
                               type="password"
                               placeholder="re-type password"
                               v-model="inputs.password2"
+                              :error-messages="$store.state.auth.registration_error.password2"
                            ></v-text-field>
                            <v-btn
                               type="submit"
                               color="primary"
                               class="mr-4"
                               @click="createAccount(inputs)"
-                              @submit="createAccount(inputs)"
+                              :loading=$store.state.auth.registrationLoading
                             >
                               Create Account
                             </v-btn>
@@ -137,12 +143,12 @@ export default {
       },
     };
   },
-  computed: mapState('signup', [
+  computed: mapState('auth', [
     'registrationCompleted',
     'registrationError',
     'registrationLoading',
   ]),
-  methods: mapActions('signup', [
+  methods: mapActions('auth', [
     'createAccount',
     'clearRegistrationStatus',
   ]),
