@@ -1,17 +1,19 @@
 
 from rest_framework import serializers
 
-from ranker.core.models import Player, Event, Match, RatingHistory
+from ranker.core.models import Player, Event, Match, RatingHistory, CustomAccountManager
 from allauth.account import app_settings as allauth_settings
 from allauth.utils import email_address_exists
 from allauth.account.adapter import get_adapter
 from allauth.account.utils import setup_user_email
 
+from django.contrib.auth import get_user_model
+
 class RegisterSerializer(serializers.Serializer):
     email = serializers.EmailField(required=allauth_settings.EMAIL_REQUIRED)
     username = serializers.CharField(required=True, write_only=True)
-    first_name = serializers.CharField(required=True, write_only=True)
-    last_name = serializers.CharField(required=True, write_only=True)
+    firstname = serializers.CharField(required=True, write_only=True)
+    lastname = serializers.CharField(required=True, write_only=True)
     password1 = serializers.CharField(required=True, write_only=True)
     password2 = serializers.CharField(required=True, write_only=True)
 
@@ -42,19 +44,18 @@ class RegisterSerializer(serializers.Serializer):
 
     def get_cleaned_data(self):
         return {
-            'first_name': self.validated_data.get('first_name', ''),
-            'last_name': self.validated_data.get('last_name', ''),
-            'password1': self.validated_data.get('password1', ''),
+            'username': self.validated_data.get('username', ''),
+            'firstname': self.validated_data.get('firstname', ''),
+            'lastname': self.validated_data.get('lastname', ''),
+            'password': self.validated_data.get('password1', ''),
             'email': self.validated_data.get('email', ''),
         }
 
     def save(self, request):
-        adapter = get_adapter()
-        user = adapter.new_user(request)
-        self.cleaned_data = self.get_cleaned_data()
-        adapter.save_user(request, user, self)
-        setup_user_email(request, user, [])
-        user.save()
+        account_manager = CustomAccountManager
+        cleaned_data = self.get_cleaned_data()
+        print(cleaned_data)
+        user = account_manager.create_user(self, **cleaned_data)
         return user
 
 class PlayerSerializer(serializers.ModelSerializer):

@@ -81,6 +81,15 @@
                               v-model="inputs.email"
                            ></v-text-field>
                            <v-text-field
+                              id="password"
+                              prepend-icon=mdi-lock
+                              name="password"
+                              label="Password"
+                              type="password"
+                              placeholder="password"
+                              v-model="inputs.password"
+                           ></v-text-field>
+                           <v-text-field
                               id="password2"
                               prepend-icon=mdi-lock
                               name="password2"

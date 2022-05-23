@@ -37,13 +37,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
+    'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',
-    'corsheaders',
-    'ranker.core',
+    'rest_auth.registration',
     'allauth',
     'allauth.account',
-    'dj_rest_auth.registration',
+    'allauth.socialaccount',
+    'ranker.core',
 ]
 
 MIDDLEWARE = [
@@ -87,6 +89,14 @@ TEMPLATES = [
     },
 ]
 
+# AUTHENTICATION_BACKENDS = [
+#     # Needed to login by username in Django admin, regardless of `allauth`
+#     'django.contrib.auth.backends.ModelBackend',
+
+#     # `allauth` specific authentication methods, such as login by e-mail
+#     'allauth.account.auth_backends.AuthenticationBackend',
+# ]
+
 WSGI_APPLICATION = 'ranker.wsgi.application'
 
 LOGIN_REDIRECT_URL = '/'
@@ -102,6 +112,8 @@ ALLOWED_HOSTS = [
     # '0.0.0.0:8000',
     # '0.0.0.0:8080',
 ]
+
+SITE_ID = 1
 
 ALLOWED_HOSTS = ['*']
 CORS_ORIGIN_ALLOW_ALL = True
@@ -194,8 +206,18 @@ USE_TZ = False
 
 # Extendable user model
 AUTH_USER_MODEL = 'core.Player'
+ACCOUNT_EMAIL_VERIFICATION = "none"
+ACCOUNT_UNIQUE_EMAIL=True
+ACCOUNT_EMAIL_REQUIRED = False
+ACCOUNT_USERNAME_REQUIRED=True
+ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+ACCOUNT_FORMS = {'signup': 'cire.forms.MyCustomSignupForm'}
+
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 REST_AUTH_REGISTER_SERIALIZERS = {
     'REGISTER_SERIALIZER': 'ranker.core.serializers.RegisterSerializer',

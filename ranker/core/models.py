@@ -11,25 +11,6 @@ import json
 
 class CustomAccountManager(BaseUserManager):
 
-    def create_user(self, email, username, firstname, lastname, password, **other_fields):
-        """
-        Creates and saves a user with the given info.
-        """
-
-        if not email:
-            raise ValueError(_('You must provide an email address'))
-
-        if not username:
-            raise ValueError(_('You must provide an user name'))
-
-        email = self.normalize_email(email)
-        user = self.model(email=email, username=username,
-                          firstname=firstname, lastname=lastname, **other_fields)
-
-        user.set_password(password)
-        user.save()
-        return user
-
     def create_superuser(self, email, username, firstname, lastname, password, **other_fields):
         """
         Creates and saves a superuser with the given info.
@@ -51,14 +32,17 @@ class CustomAccountManager(BaseUserManager):
         return self.create_user(email, username, firstname, lastname, password, **other_fields)
 
     def create_user(self, email, username, firstname, lastname, password, **other_fields):
+        """
+        Creates and saves a user with the given info.
+        """
         if not email:
             raise ValueError(_('You must provide an email address'))
 
         if not username:
             raise ValueError(_('You must provide an user name'))
 
-        email = self.normalize_email(email)
-        user = self.model(email=email, username=username,
+        email = BaseUserManager.normalize_email(email)
+        user = Player(email=email, username=username,
                           firstname=firstname, lastname=lastname, **other_fields)
 
         user.set_password(password)

@@ -3,11 +3,12 @@ FROM ubuntu:20.04
 ENV TZ=US
 ARG DEBIAN_FRONTEND=noninteractive
 
-# installs npm, python3, and pip3
-RUN apt update && apt install -y npm python3 python3-pip
+# installs python3, and pip3
+RUN apt update -yq && apt-get upgrade -yq && apt install -y python3 python3-pip curl
 
-# makes sure npm is up to date
-# RUN npm i npm@latest
+# Install npm version 12
+RUN curl -sL https://deb.nodesource.com/setup_12.x | bash - && \
+    apt-get install -yq nodejs build-essential
 
 # Sets the working directory to /code in the docker ubuntu image
 WORKDIR /code
