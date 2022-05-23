@@ -79,6 +79,19 @@ class Player(AbstractBaseUser, PermissionsMixin):
         verbose_name_plural = ('players')
 
 
+class DailyWordle:
+    player = models.ForeignKey(Player, default=None,on_delete=models.CASCADE)
+    word = models.CharField(max_length=5, blank=False)
+    guesses = models.IntegerField(max_length=1, blank=False)
+    date = models.DateField(unique=True, auto_now_add=timezone.now(), blank=False)
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField()
+
+    @property
+    def time(self):
+        return self.start_time - self.end_time
+
+
 class Match(models.Model):
     """Table for keeping track of game scores and winners."""
     winner = models.ForeignKey(Player, default=None, related_name='won_matches',on_delete=models.CASCADE)

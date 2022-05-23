@@ -72,6 +72,7 @@ export default {
   data() {
     return {
       menu: [
+        {name: this.$t("nav.convergele"), icon: "mdi-file-word-box-outline", to: "/convergele"},
         {name: this.$t("nav.main"), icon: "mdi-home-outline", to: "/"},
         {name: this.$t("nav.players"), icon: "mdi-account", to: "/players"},
         {name: this.$t("nav.logout"), icon: "mdi-login", to: "/logout"},
