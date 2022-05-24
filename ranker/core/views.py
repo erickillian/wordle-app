@@ -1,3 +1,4 @@
+from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 
@@ -9,15 +10,26 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from ranker.core.models import (
-    Player, Event, PlayerRating
+    Player, Event, PlayerRating, DailyWordle, ActiveWordle,
 )
 from ranker.core.serializers import (
     PlayerSerializer,
     EventSerializer,
     RatingHistorySerializer,
-    MatchHistorySerializer
+    MatchHistorySerializer,
+    ActiveWordleSerializer
 )
 from ranker.core.services import data
+
+import json, os, random
+from ranker.settings.dev import BASE_DIR
+
+import datetime
+
+wordle_dictionary = json.load(open(os.path.join(BASE_DIR, 'ranker/core/constants/dictionary.json')))
+wordle_target_words = json.load(open(os.path.join(BASE_DIR, 'ranker/core/constants/targetWords.json')))
+
+from ranker.core.constants.wordle import WORDLE_MAX_LENGTH, WORDLE_NUM_GUESSES
 
 N_LAST_MATCHES = 10
 N_PLAYERS = 5
@@ -120,6 +132,37 @@ class PlayerStats(APIView):
             return Response(stats)
         except PlayerRating.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+
+class WordleStatus(APIView):
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        try:
+            active_wordle = ActiveWordle.objects.get(player=request.user)
+            # case where the player started a game and didnt finish
+            serializer = ActiveWordleSerializer(active_wordle)
+
+            return JsonResponse(serializer.data)
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+class WordleGuess(APIView):
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        try:
+            active_wordle = ActiveWordle.objects.get(player=request.user)
+            # case where the player started a game and didnt finish
+            serializer = ActiveWordleSerializer(active_wordle)
+
+            return JsonResponse(serializer.data)
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
 
 
 class EventList(APIView):

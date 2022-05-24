@@ -4,10 +4,20 @@ from django.db.models.functions import Coalesce
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from django.contrib.postgres.fields import ArrayField
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
 from ranker.core.rankings import EloRating
 import json
+import os
+import random
+
+
+
+from ranker.core.constants.wordle import WORDLE_MAX_LENGTH, WORDLE_NUM_GUESSES
+from ranker.settings.dev import BASE_DIR
+
+
 
 class CustomAccountManager(BaseUserManager):
 
@@ -78,18 +88,66 @@ class Player(AbstractBaseUser, PermissionsMixin):
         verbose_name = ('player')
         verbose_name_plural = ('players')
 
-
-class DailyWordle:
-    player = models.ForeignKey(Player, default=None,on_delete=models.CASCADE)
-    word = models.CharField(max_length=5, blank=False)
-    guesses = models.IntegerField(max_length=1, blank=False)
-    date = models.DateField(unique=True, auto_now_add=timezone.now(), blank=False)
-    start_time = models.DateTimeField()
-    end_time = models.DateTimeField()
+class ActiveWordle(models.Model):
+    player = models.OneToOneField(Player, on_delete=models.CASCADE)
+    start_time = models.DateTimeField(auto_now_add=timezone.now())
+    guess_history = models.CharField(max_length=WORDLE_MAX_LENGTH*WORDLE_NUM_GUESSES, blank=True)
+    word = models.CharField(max_length=WORDLE_MAX_LENGTH, blank=False)
 
     @property
-    def time(self):
-        return self.start_time - self.end_time
+    def solved(self):
+        return self.guess_history[WORDLE_MAX_LENGTH:] is self.word
+
+    @property
+    def correct(self):
+        correct = ""
+        for i in range(0, int(len(self.guess_history) / WORDLE_MAX_LENGTH)):
+            guess = self.guess_history[i*WORDLE_MAX_LENGTH:(i+1)*WORDLE_MAX_LENGTH]
+            print(guess)
+            j = 0
+            for j in range(0, WORDLE_MAX_LENGTH):
+                if self.word[j] == guess[j]:
+                    correct += "2"
+                elif guess[j] in self.word:
+                    word_count = self.word.count(guess[j])
+                    guess_count = guess.count(guess[j])
+                    if guess_count <= word_count:
+                        correct += "1"
+                    else:
+                        right_wrong_location = 0
+                        for k in range(j+1, WORDLE_MAX_LENGTH):
+                            if self.word[k] != guess[j] and guess[j] in self.word:
+                                right_wrong_location+=1
+                        if guess_count-word_count-right_wrong_location < 1:
+                            correct += "1"
+                        else:
+                            correct += "0"
+                else:
+                    correct += "0"
+                j += 1
+        return correct
+
+    @property
+    def guesses(self):
+        return int(len(self.guess_history) / WORDLE_MAX_LENGTH)
+
+    class Meta:
+        db_table = 'active_wordle'
+        verbose_name = ('active_wordle')
+        verbose_name_plural = ('active_wordles')
+            
+
+class DailyWordle(models.Model):
+    player = models.ForeignKey(Player, default=None,on_delete=models.CASCADE)
+    word = models.CharField(max_length=5, blank=False)
+    guesses = models.PositiveSmallIntegerField(blank=False)
+    date = models.DateField(unique=True, auto_now_add=timezone.now(), blank=False)
+    time = models.DurationField()
+
+    class Meta:
+        db_table = 'wordle'
+        verbose_name = ('wordle')
+        verbose_name_plural = ('wordles')
 
 
 class Match(models.Model):
@@ -148,19 +206,12 @@ class Match(models.Model):
         verbose_name_plural = ('matchs')
 
 
-# class Game(models.Model):
-#     name = models.CharField(max_length=60, blank=False)
-#     # Points it takes to win the game
-#     winning_points = models.PositiveIntegerField(blank=False, default=11)
-#     # Points ahead you have to be to win
-#     winning_point_differential = models.PositiveIntegerField(blank=False, default=0)
-
-# class ConvergeleDailyScore(models.Model):
-#     player = models.OneToOneField(Player, default=None, primary_key=True, on_delete=models.CASCADE)
-#     date = models.DateField(unique=True)
-    
-
-
+class Game(models.Model):
+    name = models.CharField(max_length=60, blank=False)
+    # Points it takes to win the game
+    winning_points = models.PositiveIntegerField(blank=False, default=11)
+    # Points ahead you have to be to win
+    winning_point_differential = models.PositiveIntegerField(blank=False, default=0)
 
 class PlayerRating(models.Model):
     """Table for keeping track of a player's rating."""
