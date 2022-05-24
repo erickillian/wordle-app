@@ -101,3 +101,12 @@ class MatchHistorySerializer(serializers.Serializer):
     score = serializers.CharField(max_length=5)
     result = serializers.IntegerField()
     datetime = serializers.DateTimeField()
+
+class ActiveWordleSerializer(serializers.Serializer):
+    guesses = serializers.IntegerField()
+    guess_history = serializers.CharField(max_length=30)
+    solved = serializers.BooleanField()
+    start_time = serializers.DateTimeField()
+
+    class Meta:
+        exclude = ['word']
