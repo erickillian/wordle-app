@@ -9,7 +9,7 @@ urlpatterns = [
     path('player/stats/<int:player_id>', views.PlayerStats.as_view()),
     path('history/rating/<int:player_id>', views.PlayerRatingHistory.as_view()),
     path('history/match/<int:player_id>', views.PlayerMatchHistory.as_view()),
-    path('wordle/status/', views.WordleStatus.as_view()),
+    path('wordle/status/', views.Wordle.as_view()),
     # path('events/all', views.EventList.as_view()),
     # path('event/details/<int:event_id>', views.EventDetail.as_view())
 ]

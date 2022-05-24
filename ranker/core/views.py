@@ -17,7 +17,8 @@ from ranker.core.serializers import (
     EventSerializer,
     RatingHistorySerializer,
     MatchHistorySerializer,
-    ActiveWordleSerializer
+    ActiveWordleSerializer,
+    WordleGuessSerializer
 )
 from ranker.core.services import data
 
@@ -35,7 +36,6 @@ N_LAST_MATCHES = 10
 N_PLAYERS = 5
 N_DAYS_STATS_MAIN = 7
 LB_CACHE_MINUTES = 1
-
 
 class LeaderBoard(APIView):
     """
@@ -135,33 +135,48 @@ class PlayerStats(APIView):
 
 
 
-class WordleStatus(APIView):
+class Wordle(APIView):
     authentication_classes = [SessionAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         try:
-            active_wordle = ActiveWordle.objects.get(player=request.user)
+            serializer = ActiveWordleSerializer(active_wordle)
+
+            return JsonResponse(serializer.data)(player=request.user)
             # case where the player started a game and didnt finish
             serializer = ActiveWordleSerializer(active_wordle)
 
             return JsonResponse(serializer.data)
         except:
             return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def post(self, request, guess):
+        try:
+            active_wordle = ActiveWordle.objects.get(player=request.user)
+            wordle = DailyWordle.objects.get(player=request.user, date=datetime.date())
+
+            serializer = WordleGuessSerializer(active_wordle)
+            return JsonResponse(serializer.data)
+
+
+            # case where the player started a game and didnt finish
+            serializer = ActiveWordleSerializer(active_wordle)
+            return JsonResponse(serializer.data)
+        except ActiveWordle.DoesNotExist:
+            word = random.choice(wordle_target_words)
+            active_wordle = ActiveWordle.objects.create(player=request.user, word=word, guess_history=guess)
+
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        except DailyWordle.DoesNotExist:
+             return Response(status=status.HTTP_200_OK)
+
 
 class WordleGuess(APIView):
     authentication_classes = [SessionAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        try:
-            active_wordle = ActiveWordle.objects.get(player=request.user)
-            # case where the player started a game and didnt finish
-            serializer = ActiveWordleSerializer(active_wordle)
-
-            return JsonResponse(serializer.data)
-        except:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+    
 
 
 

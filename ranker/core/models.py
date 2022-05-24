@@ -141,7 +141,7 @@ class DailyWordle(models.Model):
     player = models.ForeignKey(Player, default=None,on_delete=models.CASCADE)
     word = models.CharField(max_length=5, blank=False)
     guesses = models.PositiveSmallIntegerField(blank=False)
-    date = models.DateField(unique=True, auto_now_add=timezone.now(), blank=False)
+    date = models.DateField(auto_now_add=timezone.now(), blank=False)
     time = models.DurationField()
 
     class Meta:
