@@ -82,21 +82,11 @@
 
 <script>
 
-const targetWords = ["hello", "howdy"]
 
 // CONSTANTS
 const WORD_LENGTH = 5;
 const FLIP_ANIMATION_DURATION = 750
 const DANCE_ANIMATION_DURATION = 500
-
-const keyboard = document.querySelector("data-keyboard") // get the keyboard
-const alertContainer = document.querySelector("data-alert-container") // get the empty div container for alerts
-const guessGrid = document.querySelector("[data-guess-grid]") // get the grid of tiles
-
-const offsetFromDate = new Date(2022, 0, 1); // starting date
-const msOffset = Date.now() - offsetFromDate // get difference in milliseconds
-const dayOffset = msOffset / 1000 / 60 / 60 / 24 // convert to days
-const targetWord = targetWords[Math.floor(dayOffset)] // get the word in the array at that index, and every day, a new index
 
 export default {
     name: "wordle",
@@ -104,70 +94,74 @@ export default {
     mounted() {
         document.addEventListener("click", this.handleMouseClick);
         document.addEventListener("keydown", this.handleKeyPress);
+        this.guessGrid = this.$el.querySelector("[data-guess-grid]")
+        this.keyboard = this.$el.querySelector("[data-keyboard]")
+        this.alertContainer = this.$el.querySelector("[data-alert-container]") // get the empty div container for alerts
+        this.targetWord = "hello"
+        this.targetWords = ["hello", "howdy"]
     },
-    data: function () {
-        this.keyboard = keyboard;
-        this.alertContainer = alertContainer;
-        this.guessGrid = guessGrid;
-        this.offsetFromDate = offsetFromDate;
-        this.msOffset = msOffset;
-        this.datOffset = dayOffset;
-        this.targetWord = targetWord;
-        this.targetWords = targetWords;
-    },
+    // data: function () {
+    //     this.keyboard = keyboard;
+    //     this.alertContainer = alertContainer;
+    //     this.guessGrid = guessGrid;
+    //     this.offsetFromDate = offsetFromDate;
+    //     this.msOffset = msOffset;
+    //     this.datOffset = dayOffset;
+    //     this.targetWord = targetWord;
+    //     this.targetWords = targetWords;
+    // },
     // mounted: this.startInteraction(),
     methods: {
         startInteraction() { // start listening for clicks and keypresses
-            document.addEventListener("click", handleMouseClick);
-            document.addEventListener("keydown", handleKeyPress);
+            document.addEventListener("click", this.handleMouseClick);
+            document.addEventListener("keydown", this.handleKeyPress);
         },
         stopInteraction() { // remove the event listeners for clicks and keypresses, effectively making the user unable to interact or type anything
-            document.removeEventListener("click", handleMouseClick);
-            document.removeEventListener("keydown", handleKeyPress);
+            document.removeEventListener("click", this.handleMouseClick);
+            document.removeEventListener("keydown", this.handleKeyPress);
         },
         handleMouseClick(e) {
             if (e.target.matches("[data-key")) { // if event target is a key, press that key
-                // self.methods.pressKey(e.target.dataset.key);
-                console.log(self)
-
+                this.pressKey(e.target.dataset.key);
                 return;
             }
 
             if (e.target.matches("[data-enter]")) { // if user clicks enter, submit the guess
-                submitGuess();
+                this.submitGuess();
                 return;
             }
 
             if (e.target.matches("[data-delete]")) { // if user clicks delete, remove that key
-                deleteKey();
+                this.deleteKey();
                 return;
             }
         },
         handleKeyPress(e) {
             if (e.key === "Enter") { // if the key is enter, submit guess
-                submitGuess()
+                this.submitGuess()
                 return
             }
 
             if (e.key === "Backspace" || e.key === "Delete") { // if user presses backspace or delete, delete key
-                deleteKey()
+                this.deleteKey()
             }
 
             if (e.key.match(/^[a-z]$/)) { // regex for one single letter between a and z
-                pressKey(e.key)
+                this.pressKey(e.key)
                 return
             }
         },
         pressKey(key) { // add key to first tile in grid
-            const activeTiles = getActiveTiles() // get array of active tiles
+            const activeTiles = this.getActiveTiles() // get array of active tiles
             if (activeTiles.length >= WORD_LENGTH) return // make sure that user cannot keep typing after 5 letters
+            
             const nextTile = this.guessGrid.querySelector(":not([data-letter])") // returns the first tile that doesn't have a value
             nextTile.dataset.letter = key.toLowerCase() // add the letter to the tile's dataset
             nextTile.textContent = key // make the html the key
             nextTile.dataset.state = "active" // set it to active
         },
         deleteKey() {
-            const activeTiles = getActiveTiles() // get array of active tiles
+            const activeTiles = this.getActiveTiles() // get array of active tiles
             const lastTile = activeTiles[activeTiles.length - 1] // get the last active tile
             if (lastTile === null) return // if that tile doesn't have any content, return
             lastTile.textContent = "" // set the text content to an empty string
@@ -179,37 +173,40 @@ export default {
             // return all the tiles that have the state of active
         },
         submitGuess() {
-            const activeTiles = [...getActiveTiles()] // get the array of active tiles
+            const activeTiles = [...this.getActiveTiles()] // get the array of active tiles
             if (activeTiles.length !== WORD_LENGTH) { // if the guess isn't long enough, can't submit it!
-                showAlert("Not enough letters!")
-                shakeTiles(activeTiles)
+                this.showAlert("Not enough letters!")
+                this.shakeTiles(activeTiles)
                 return
             }
-
             const guess = activeTiles.reduce((word, tile) => { // sum the array of individual letters into a string
                 return word + tile.dataset.letter
             }, "") // returns a string
 
-            if (!dictionary.includes(guess)) { // when the guess isn't a real word
-                showAlert("Not in word list!")
-                shakeTiles(activeTiles)
+            if (!this.targetWords.includes(guess)) { // when the guess isn't a real word
+                this.showAlert("Not in word list!")
+                this.shakeTiles(activeTiles)
                 return
             }
 
-            stopInteraction()
-            activeTiles.forEach((...params) => flipTile(...params, guess)) // flip tile animation
+            this.stopInteraction()
+            activeTiles.forEach((...params) => this.flipTile(...params, guess)) // flip tile animation
         },
         flipTile(tile, index, array, guess) {
             const letter = tile.dataset.letter
-            const key = this.keyboard.querySelector(`[data-key="${letter}"i]`) // get each key - the i makes it case insensitive
+            
+            const key = this.keyboard.querySelector(`[data-key="${letter}"i]`) // get each key - the i makes it case insensitivehel
             setTimeout(() => {
                 tile.classList.add("flip")
             }, index * FLIP_ANIMATION_DURATION / 2)
 
             tile.addEventListener("transitionend", () => {
                 tile.classList.remove("flip") // remvoe flip class for animation
+                console.log(this.targetWord)
                 if (this.targetWord[index] === letter) {
+                    console.log(tile.dataset.state)
                     tile.dataset.state = "correct"
+                    console.log(tile.dataset.state)
                     key.classList.add("correct") // while flipping, if it's the right location and right letter, add correct class
                 } else if (this.targetWord.includes(letter)) { // otherwise if word includes letter, add wrong location class
                     tile.dataset.state = "wrong-location"
@@ -221,8 +218,8 @@ export default {
 
                 if (index === array.length - 1) { // if last tile, user can start interacting again
                     tile.addEventListener("transitionend", () => {
-                        startInteraction()
-                        checkWinLose(guess, array)
+                        this.startInteraction()
+                        this.checkWinLose(guess, array)
                     }, { once: true })
                 }
             }, { once: true })
@@ -250,9 +247,9 @@ export default {
         },
         checkWinLose(guess, tiles) {
             if (guess === this.targetWord) {
-                showAlert("Wow! You've won! I didn't think you could do it!", 5000)
-                danceTiles(tiles)
-                stopInteraction()
+                this.showAlert("Wow! You've won! I didn't think you could do it!", 5000)
+                this.danceTiles(tiles)
+                this.stopInteraction()
                 return
             }
 
