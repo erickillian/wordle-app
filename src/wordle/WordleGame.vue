@@ -97,8 +97,8 @@ export default {
         this.guessGrid = this.$el.querySelector("[data-guess-grid]")
         this.keyboard = this.$el.querySelector("[data-keyboard]")
         this.alertContainer = this.$el.querySelector("[data-alert-container]") // get the empty div container for alerts
-        this.targetWord = "hello"
-        this.targetWords = ["hello", "howdy"]
+        this.targetWord = "hooll"
+        this.targetWords = ["hello", "howdy", "hooll", "hoolo"]
     },
     // data: function () {
     //     this.keyboard = keyboard;
@@ -163,7 +163,7 @@ export default {
         deleteKey() {
             const activeTiles = this.getActiveTiles() // get array of active tiles
             const lastTile = activeTiles[activeTiles.length - 1] // get the last active tile
-            if (lastTile === null) return // if that tile doesn't have any content, return
+            if (!lastTile) return // if that tile doesn't have any content, return
             lastTile.textContent = "" // set the text content to an empty string
             delete lastTile.dataset.state // delete active state
             delete lastTile.dataset.letter // delete letter dataset
@@ -202,11 +202,8 @@ export default {
 
             tile.addEventListener("transitionend", () => {
                 tile.classList.remove("flip") // remvoe flip class for animation
-                console.log(this.targetWord)
                 if (this.targetWord[index] === letter) {
-                    console.log(tile.dataset.state)
                     tile.dataset.state = "correct"
-                    console.log(tile.dataset.state)
                     key.classList.add("correct") // while flipping, if it's the right location and right letter, add correct class
                 } else if (this.targetWord.includes(letter)) { // otherwise if word includes letter, add wrong location class
                     tile.dataset.state = "wrong-location"
@@ -256,9 +253,9 @@ export default {
             const remainingTiles = this.guessGrid.querySelectorAll(":not([data-letter])") // get all empty tiles
 
             if (remainingTiles.length === 0) { // if no more remaining tiles
-                showAlert("🚨LOSER DETECTED!🚨")
-                showAlert(`The word was: ${this.targetWord.toUpperCase()}`, null)
-                stopInteraction
+                this.showAlert("🚨LOSER DETECTED!🚨")
+                this.showAlert(`The word was: ${this.targetWord.toUpperCase()}`, null)
+                this.stopInteraction()
             }
         },
         danceTiles(tiles) {
