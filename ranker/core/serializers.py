@@ -110,3 +110,9 @@ class ActiveWordleSerializer(serializers.Serializer):
 
     class Meta:
         exclude = ['word']
+
+
+class WordleGuessSerializer(serializers.Serializer):
+    solved = serializers.BooleanField()
+    guess_history = serializers.CharField(max_length=30)
+    start_time = serializers.DateTimeField()
