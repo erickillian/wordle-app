@@ -127,7 +127,8 @@ export default {
         },
         handleMouseClick(e) {
             if (e.target.matches("[data-key")) { // if event target is a key, press that key
-                pressKey(e.target.dataset.key);
+                // self.methods.pressKey(e.target.dataset.key);
+                console.log(self)
 
                 return;
             }
