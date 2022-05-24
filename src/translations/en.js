@@ -10,7 +10,7 @@ export const ENGLISH_TRANSLATIONS = {
     },
     nav: {
         "main": "Home",
-        "convergele": "Convergele",
+        "convergle": "Convergle",
         "players": "Players",
         "login": "Login",
         "logout": "Logout",

@@ -4,7 +4,7 @@ import Router from 'vue-router'
 import Home from '../views/Home.vue'
 import Players from '../views/Players.vue'
 import Events from '../views/Events.vue'
-import Convergele from '../views/Convergele';
+import Wordle from '../views/Wordle';
 import NotFound from '../views/NotFound.vue'
 import Login from '../views/Login';
 import Lost from '../views/Lost';
@@ -100,10 +100,10 @@ export default new Router({
             beforeEnter: requireAuthenticated,
         },
         {
-            path: '/convergele',
-            name: 'convergele',
+            path: '/wordle',
+            name: 'wordle',
             meta: { layout: 'main-layout' },
-            component: Convergele,
+            component: Wordle,
             beforeEnter: requireAuthenticated,
         },
         {

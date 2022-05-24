@@ -1,372 +1,282 @@
-<script setup lang="ts">
-import { onUnmounted } from 'vue'
-import { getWordOfTheDay, allWords } from './words'
-import Keyboard from './Keyboard.vue'
-import { LetterState } from './types'
-
-// Get word of the day
-const answer = getWordOfTheDay()
-
-// Board state. Each tile is represented as { letter, state }
-const board = $ref(
-  Array.from({ length: 6 }, () =>
-    Array.from({ length: 5 }, () => ({
-      letter: '',
-      state: LetterState.INITIAL
-    }))
-  )
-)
-
-// Current active row.
-let currentRowIndex = $ref(0)
-const currentRow = $computed(() => board[currentRowIndex])
-
-// Feedback state: message and shake
-let message = $ref('')
-let grid = $ref('')
-let shakeRowIndex = $ref(-1)
-let success = $ref(false)
-
-// Keep track of revealed letters for the virtual keyboard
-const letterStates = {} //Record<string, LetterState> = {}
-
-// Handle keyboard input.
-let allowInput = true
-
-const onKeyup = (e) => onKey(e.key)
-
-window.addEventListener('keyup', onKeyup)
-
-onUnmounted(() => {
-  window.removeEventListener('keyup', onKeyup)
-})
-
-function onKey(key) {
-  if (!allowInput) return
-  if (/^[a-zA-Z]$/.test(key)) {
-    fillTile(key.toLowerCase())
-  } else if (key === 'Backspace') {
-    clearTile()
-  } else if (key === 'Enter') {
-    completeRow()
-  }
-}
-
-function fillTile(letter) {
-  for (const tile of currentRow) {
-    if (!tile.letter) {
-      tile.letter = letter
-      break
-    }
-  }
-}
-
-function clearTile() {
-  for (const tile of [...currentRow].reverse()) {
-    if (tile.letter) {
-      tile.letter = ''
-      break
-    }
-  }
-}
-
-function completeRow() {
-  if (currentRow.every((tile) => tile.letter)) {
-    const guess = currentRow.map((tile) => tile.letter).join('')
-    if (!allWords.includes(guess) && guess !== answer) {
-      shake()
-      showMessage(`Not in word list`)
-      return
-    }
-
-    const answerLetters = answer.split('')
-    // first pass: mark correct ones
-    currentRow.forEach((tile, i) => {
-      if (answerLetters[i] === tile.letter) {
-        tile.state = letterStates[tile.letter] = LetterState.CORRECT
-        answerLetters[i] = null
-      }
-    })
-    // second pass: mark the present
-    currentRow.forEach((tile) => {
-      if (!tile.state && answerLetters.includes(tile.letter)) {
-        tile.state = LetterState.PRESENT
-        answerLetters[answerLetters.indexOf(tile.letter)] = null
-        if (!letterStates[tile.letter]) {
-          letterStates[tile.letter] = LetterState.PRESENT
-        }
-      }
-    })
-    // 3rd pass: mark absent
-    currentRow.forEach((tile) => {
-      if (!tile.state) {
-        tile.state = LetterState.ABSENT
-        if (!letterStates[tile.letter]) {
-          letterStates[tile.letter] = LetterState.ABSENT
-        }
-      }
-    })
-
-    allowInput = false
-    if (currentRow.every((tile) => tile.state === LetterState.CORRECT)) {
-      // yay!
-      setTimeout(() => {
-        grid = genResultGrid()
-        showMessage(
-          ['Genius', 'Magnificent', 'Impressive', 'Splendid', 'Great', 'Phew'][
-            currentRowIndex
-          ],
-          -1
-        )
-        success = true
-      }, 1600)
-    } else if (currentRowIndex < board.length - 1) {
-      // go the next row
-      currentRowIndex++
-      setTimeout(() => {
-        allowInput = true
-      }, 1600)
-    } else {
-      // game over :(
-      setTimeout(() => {
-        showMessage(answer.toUpperCase(), -1)
-      }, 1600)
-    }
-  } else {
-    shake()
-    showMessage('Not enough letters')
-  }
-}
-
-function showMessage(msg, time = 1000) {
-  message = msg
-  if (time > 0) {
-    setTimeout(() => {
-      message = ''
-    }, time)
-  }
-}
-
-function shake() {
-  shakeRowIndex = currentRowIndex
-  setTimeout(() => {
-    shakeRowIndex = -1
-  }, 1000)
-}
-
-const icons = {
-  [LetterState.CORRECT]: '🟩',
-  [LetterState.PRESENT]: '🟨',
-  [LetterState.ABSENT]: '⬜',
-  [LetterState.INITIAL]: null
-}
-
-function genResultGrid() {
-  return board
-    .slice(0, currentRowIndex + 1)
-    .map((row) => {
-      return row.map((tile) => icons[tile.state]).join('')
-    })
-    .join('\n')
-}
-</script>
-
 <template>
-<div>
-  <Transition>
-    <div class="message" v-if="message">
-      {{ message }}
-      <pre v-if="grid">{{ grid }}</pre>
-    </div>
-  </Transition>
-  <header>
-    <h1>Convergele</h1>
-  </header>
-  <div id="board">
-    <div
-      v-for="(row, index) in board"
-      :class="[
-        'row',
-        shakeRowIndex === index && 'shake',
-        success && currentRowIndex === index && 'jump'
-      ]"
-      :key="row.id"
-    >
-      <div
-        v-for="(tile, index) in row"
-        :class="['tile', tile.letter && 'filled', tile.state && 'revealed']"
-        :key="tile.d"
-      >
-        <div class="front" :style="{ transitionDelay: `${index * 300}ms` }">
-          {{ tile.letter }}
+    <div>
+        <h1 class="header">Convergle</h1>
+        <div class="alert-container" data-alert-container></div>
+        <div data-guess-grid class="guess-grid">
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
+            <div class="tile"></div>
         </div>
-        <div
-          :class="['back', tile.state]"
-          :style="{
-            transitionDelay: `${index * 300}ms`,
-            animationDelay: `${index * 100}ms`
-          }"
-        >
-          {{ tile.letter }}
+        <div data-keyboard class="keyboard">
+            <button class="key" data-key="Q">Q</button>
+            <button class="key" data-key="W">W</button>
+            <button class="key" data-key="E">E</button>
+            <button class="key" data-key="R">R</button>
+            <button class="key" data-key="T">T</button>
+            <button class="key" data-key="Y">Y</button>
+            <button class="key" data-key="U">U</button>
+            <button class="key" data-key="I">I</button>
+            <button class="key" data-key="O">O</button>
+            <button class="key" data-key="P">P</button>
+            <div class="space"></div>
+            <button class="key" data-key="A">A</button>
+            <button class="key" data-key="S">S</button>
+            <button class="key" data-key="D">D</button>
+            <button class="key" data-key="F">F</button>
+            <button class="key" data-key="G">G</button>
+            <button class="key" data-key="H">H</button>
+            <button class="key" data-key="J">J</button>
+            <button class="key" data-key="K">K</button>
+            <button class="key" data-key="L">L</button>
+            <div class="space"></div>
+            <button data-enter class="key large">Enter</button>
+            <button class="key" data-key="Z">Z</button>
+            <button class="key" data-key="X">X</button>
+            <button class="key" data-key="C">C</button>
+            <button class="key" data-key="V">V</button>
+            <button class="key" data-key="B">B</button>
+            <button class="key" data-key="N">N</button>
+            <button class="key" data-key="M">M</button>
+            <button data-delete class="key large">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
+                    <path fill="var(--color-tone-1)"
+                        d="M22 3H7c-.69 0-1.23.35-1.59.88L0 12l5.41 8.11c.36.53.9.89 1.59.89h15c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H7.07L2.4 12l4.66-7H22v14zm-11.59-2L14 13.41 17.59 17 19 15.59 15.41 12 19 8.41 17.59 7 14 10.59 10.41 7 9 8.41 12.59 12 9 15.59z">
+                    </path>
+                </svg>
+            </button>
         </div>
-      </div>
+
     </div>
-  </div>
-  <Keyboard @key="onKey" :letter-states="letterStates" />
-  </div>
+
 </template>
-
-<style scoped>
-#board {
-  display: grid;
-  grid-template-rows: repeat(6, 1fr);
-  grid-gap: 5px;
-  padding: 10px;
-  box-sizing: border-box;
-  --height: min(420px, calc(var(--vh, 100vh) - 310px));
-  height: var(--height);
-  width: min(350px, calc(var(--height) / 6 * 5));
-  margin: 0px auto;
-}
-.message {
-  position: absolute;
-  left: 50%;
-  top: 80px;
-  color: #fff;
-  background-color: rgba(0, 0, 0, 0.85);
-  padding: 16px 20px;
-  z-index: 2;
-  border-radius: 4px;
-  transform: translateX(-50%);
-  transition: opacity 0.3s ease-out;
-  font-weight: 600;
-}
-.message.v-leave-to {
-  opacity: 0;
-}
-.row {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  grid-gap: 5px;
-}
-.tile {
-  width: 100%;
-  font-size: 2rem;
-  line-height: 2rem;
-  font-weight: bold;
-  vertical-align: middle;
-  text-transform: uppercase;
-  user-select: none;
-  position: relative;
-}
-.tile.filled {
-  animation: zoom 0.2s;
-}
-.tile .front,
-.tile .back {
-  box-sizing: border-box;
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  transition: transform 0.6s;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-}
-.tile .front {
-  border: 2px solid #d3d6da;
-}
-.tile.filled .front {
-  border-color: #999;
-}
-.tile .back {
-  transform: rotateX(180deg);
-}
-.tile.revealed .front {
-  transform: rotateX(180deg);
-}
-.tile.revealed .back {
-  transform: rotateX(0deg);
-}
-
-@keyframes zoom {
-  0% {
-    transform: scale(1.1);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-.shake {
-  animation: shake 0.5s;
-}
-
-@keyframes shake {
-  0% {
-    transform: translate(1px);
-  }
-  10% {
-    transform: translate(-2px);
-  }
-  20% {
-    transform: translate(2px);
-  }
-  30% {
-    transform: translate(-2px);
-  }
-  40% {
-    transform: translate(2px);
-  }
-  50% {
-    transform: translate(-2px);
-  }
-  60% {
-    transform: translate(2px);
-  }
-  70% {
-    transform: translate(-2px);
-  }
-  80% {
-    transform: translate(2px);
-  }
-  90% {
-    transform: translate(-2px);
-  }
-  100% {
-    transform: translate(1px);
-  }
-}
-
-.jump .tile .back {
-  animation: jump 0.5s;
-}
-
-@keyframes jump {
-  0% {
-    transform: translateY(0px);
-  }
-  20% {
-    transform: translateY(5px);
-  }
-  60% {
-    transform: translateY(-25px);
-  }
-  90% {
-    transform: translateY(3px);
-  }
-  100% {
-    transform: translateY(0px);
-  }
-}
-
-@media (max-height: 680px) {
-  .tile {
-    font-size: 3vh;
-  }
-}
+<style src="./styles.css" >
 </style>
+        
+
+<script>
+
+const targetWords = ["hello", "howdy"]
+
+// CONSTANTS
+const WORD_LENGTH = 5;
+const FLIP_ANIMATION_DURATION = 750
+const DANCE_ANIMATION_DURATION = 500
+
+const keyboard = document.querySelector("data-keyboard") // get the keyboard
+const alertContainer = document.querySelector("data-alert-container") // get the empty div container for alerts
+const guessGrid = document.querySelector("[data-guess-grid]") // get the grid of tiles
+
+const offsetFromDate = new Date(2022, 0, 1); // starting date
+const msOffset = Date.now() - offsetFromDate // get difference in milliseconds
+const dayOffset = msOffset / 1000 / 60 / 60 / 24 // convert to days
+const targetWord = targetWords[Math.floor(dayOffset)] // get the word in the array at that index, and every day, a new index
+
+export default {
+    name: "wordle",
+    // components: { SimpleCard, LeadersCard, BigNumberCard },
+    mounted() {
+        document.addEventListener("click", this.handleMouseClick);
+        document.addEventListener("keydown", this.handleKeyPress);
+    },
+    data: function () {
+        this.keyboard = keyboard;
+        this.alertContainer = alertContainer;
+        this.guessGrid = guessGrid;
+        this.offsetFromDate = offsetFromDate;
+        this.msOffset = msOffset;
+        this.datOffset = dayOffset;
+        this.targetWord = targetWord;
+        this.targetWords = targetWords;
+    },
+    // mounted: this.startInteraction(),
+    methods: {
+        startInteraction() { // start listening for clicks and keypresses
+            document.addEventListener("click", handleMouseClick);
+            document.addEventListener("keydown", handleKeyPress);
+        },
+        stopInteraction() { // remove the event listeners for clicks and keypresses, effectively making the user unable to interact or type anything
+            document.removeEventListener("click", handleMouseClick);
+            document.removeEventListener("keydown", handleKeyPress);
+        },
+        handleMouseClick(e) {
+            if (e.target.matches("[data-key")) { // if event target is a key, press that key
+                pressKey(e.target.dataset.key);
+
+                return;
+            }
+
+            if (e.target.matches("[data-enter]")) { // if user clicks enter, submit the guess
+                submitGuess();
+                return;
+            }
+
+            if (e.target.matches("[data-delete]")) { // if user clicks delete, remove that key
+                deleteKey();
+                return;
+            }
+        },
+        handleKeyPress(e) {
+            if (e.key === "Enter") { // if the key is enter, submit guess
+                submitGuess()
+                return
+            }
+
+            if (e.key === "Backspace" || e.key === "Delete") { // if user presses backspace or delete, delete key
+                deleteKey()
+            }
+
+            if (e.key.match(/^[a-z]$/)) { // regex for one single letter between a and z
+                pressKey(e.key)
+                return
+            }
+        },
+        pressKey(key) { // add key to first tile in grid
+            const activeTiles = getActiveTiles() // get array of active tiles
+            if (activeTiles.length >= WORD_LENGTH) return // make sure that user cannot keep typing after 5 letters
+            const nextTile = this.guessGrid.querySelector(":not([data-letter])") // returns the first tile that doesn't have a value
+            nextTile.dataset.letter = key.toLowerCase() // add the letter to the tile's dataset
+            nextTile.textContent = key // make the html the key
+            nextTile.dataset.state = "active" // set it to active
+        },
+        deleteKey() {
+            const activeTiles = getActiveTiles() // get array of active tiles
+            const lastTile = activeTiles[activeTiles.length - 1] // get the last active tile
+            if (lastTile === null) return // if that tile doesn't have any content, return
+            lastTile.textContent = "" // set the text content to an empty string
+            delete lastTile.dataset.state // delete active state
+            delete lastTile.dataset.letter // delete letter dataset
+        },
+        getActiveTiles() {
+            return this.guessGrid.querySelectorAll('[data-state="active"]')
+            // return all the tiles that have the state of active
+        },
+        submitGuess() {
+            const activeTiles = [...getActiveTiles()] // get the array of active tiles
+            if (activeTiles.length !== WORD_LENGTH) { // if the guess isn't long enough, can't submit it!
+                showAlert("Not enough letters!")
+                shakeTiles(activeTiles)
+                return
+            }
+
+            const guess = activeTiles.reduce((word, tile) => { // sum the array of individual letters into a string
+                return word + tile.dataset.letter
+            }, "") // returns a string
+
+            if (!dictionary.includes(guess)) { // when the guess isn't a real word
+                showAlert("Not in word list!")
+                shakeTiles(activeTiles)
+                return
+            }
+
+            stopInteraction()
+            activeTiles.forEach((...params) => flipTile(...params, guess)) // flip tile animation
+        },
+        flipTile(tile, index, array, guess) {
+            const letter = tile.dataset.letter
+            const key = this.keyboard.querySelector(`[data-key="${letter}"i]`) // get each key - the i makes it case insensitive
+            setTimeout(() => {
+                tile.classList.add("flip")
+            }, index * FLIP_ANIMATION_DURATION / 2)
+
+            tile.addEventListener("transitionend", () => {
+                tile.classList.remove("flip") // remvoe flip class for animation
+                if (this.targetWord[index] === letter) {
+                    tile.dataset.state = "correct"
+                    key.classList.add("correct") // while flipping, if it's the right location and right letter, add correct class
+                } else if (this.targetWord.includes(letter)) { // otherwise if word includes letter, add wrong location class
+                    tile.dataset.state = "wrong-location"
+                    key.classList.add("wrong-location")
+                } else { // else add wrong class
+                    tile.dataset.state = "wrong"
+                    key.classList.add("wrong")
+                }
+
+                if (index === array.length - 1) { // if last tile, user can start interacting again
+                    tile.addEventListener("transitionend", () => {
+                        startInteraction()
+                        checkWinLose(guess, array)
+                    }, { once: true })
+                }
+            }, { once: true })
+        },
+        showAlert(message, duration = 1000) {
+            const alert = document.createElement("div") // get the empty alert div
+            alert.textContent = message // add message
+            alert.classList.add("alert") // add alert class
+            this.alertContainer.prepend(alert)
+            if (duration == null) return
+            setTimeout(() => {
+                alert.classList.add("hide")
+                alert.addEventListener("transitionend", () => {
+                    alert.remove()
+                })
+            }, duration)
+        },
+        shakeTiles(tiles) {
+            tiles.forEach(tile => {
+                tile.classList.add("shake")
+                tile.addEventListener("animationend", () => {
+                    tile.classList.remove("shake")
+                }, { once: true })
+            })
+        },
+        checkWinLose(guess, tiles) {
+            if (guess === this.targetWord) {
+                showAlert("Wow! You've won! I didn't think you could do it!", 5000)
+                danceTiles(tiles)
+                stopInteraction()
+                return
+            }
+
+            const remainingTiles = this.guessGrid.querySelectorAll(":not([data-letter])") // get all empty tiles
+
+            if (remainingTiles.length === 0) { // if no more remaining tiles
+                showAlert("🚨LOSER DETECTED!🚨")
+                showAlert(`The word was: ${this.targetWord.toUpperCase()}`, null)
+                stopInteraction
+            }
+        },
+        danceTiles(tiles) {
+            tiles.forEach((tile, index) => {
+                setTimeout(() => {
+                    tile.classList.add("dance")
+                    tile.addEventListener(
+                        "animationend",
+                        () => {
+                            tile.classList.remove("dance")
+                        },
+                        { once: true }
+                    )
+                }, (index * DANCE_ANIMATION_DURATION) / 5)
+            })
+        },
+    },
+};
+</script>
