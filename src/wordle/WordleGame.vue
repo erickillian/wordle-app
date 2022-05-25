@@ -103,16 +103,28 @@ export default {
         initial_load() {
             return this.$store.state.wordle.initial_load;
         },
-        guess_loaded() {
-            return this.$store.state.wordle.guess_loading;
+        guess_ok() {
+            return this.$store.state.wordle.guess_ok;
+        },
+        guess_error() {
+            return this.$store.state.wordle.guess_error;
         },
     },
     watch: {
         initial_load() {
-            this.loadGuesses()
+            this.initialGuesses()
         },
-        guess_loaded() {
-            this.newGuess()
+        guess_ok() {
+            if (this.$store.state.wordle.guess_ok == true) {
+                this.guessOk()
+                this.$store.commit('wordle/WORDLE_GUESS_RESPONDED')
+            }  
+        },
+        guess_error() {
+            if (this.$store.state.wordle.guess_error == true) {
+                this.guessError()
+                this.$store.commit('wordle/WORDLE_GUESS_RESPONDED')
+            }  
         },
     },
 
@@ -207,13 +219,12 @@ export default {
             }, "") // returns a string
 
             this.guess({ guess: guess });
-
-            this.inputs.guess = ''
+            console.log("Submitting Guess")
 
             this.stopInteraction()
-            activeTiles.forEach((...params) => this.flipTile(...params, guess)) // flip tile animation
+            // activeTiles.forEach((...params) => this.flipTile(...params, guess)) // flip tile animation
         },
-        loadGuesses() {
+        initialGuesses() {
             if (this.$store.state.wordle.status_loading == false) {
                 const guess_history = this.$store.state.wordle.info.guess_history;
                 const correct = this.$store.state.wordle.info.correct;
@@ -263,12 +274,24 @@ export default {
             }
             // this.status();
         },
-        newGuess(guess, correct) {
+        guessOk() {
+            const guess = this.$store.state.wordle.info.guess_history.slice(-WORD_LENGTH);
+            const correct = this.$store.state.wordle.info.correct.slice(-WORD_LENGTH);
+            this.startInteraction()
+
+            const activeTiles = [...this.getActiveTiles()]
+            activeTiles.forEach((...params) => this.flipTile(...params, guess, correct)) // flip tile animation
 
         },
-        flipTile(tile, index, array, guess) {
-            const letter = tile.dataset.letter
-            
+        guessError() {
+            this.startInteraction()
+            console.log("guess error")
+            const activeTiles = [...this.getActiveTiles()]
+            this.shakeTiles(activeTiles)// flip tile animation
+
+        },
+        flipTile(tile, index, array, guess, correct) {
+            const letter = tile.dataset.letter           
             const key = this.keyboard.querySelector(`[data-key="${letter}"i]`) // get each key - the i makes it case insensitivehel
             setTimeout(() => {
                 tile.classList.add("flip")
@@ -276,13 +299,13 @@ export default {
 
             tile.addEventListener("transitionend", () => {
                 tile.classList.remove("flip") // remvoe flip class for animation
-                if (this.targetWord[index] === letter) {
+                if (correct[index] === "2") {
                     tile.dataset.state = "correct"
                     key.classList.add("correct") // while flipping, if it's the right location and right letter, add correct class
-                } else if (this.targetWord.includes(letter)) { // otherwise if word includes letter, add wrong location class
+                } else if (correct[index] === "1") { // otherwise if word includes letter, add wrong location class
                     tile.dataset.state = "wrong-location"
                     key.classList.add("wrong-location")
-                } else { // else add wrong class
+                } else if (correct[index] === "0") { // else add wrong class
                     tile.dataset.state = "wrong"
                     key.classList.add("wrong")
                 }
