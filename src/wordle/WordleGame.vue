@@ -72,9 +72,7 @@
                 </svg>
             </button>
         </div>
-
     </div>
-
 </template>
 <style src="./styles.css" >
 </style>
@@ -94,15 +92,27 @@ export default {
     mounted() {
         document.addEventListener("click", this.handleMouseClick);
         document.addEventListener("keydown", this.handleKeyPress);
-        this.guessGrid = this.$el.querySelector("[data-guess-grid]")
-        this.keyboard = this.$el.querySelector("[data-keyboard]")
-        this.alertContainer = this.$el.querySelector("[data-alert-container]") // get the empty div container for alerts
-        this.targetWord = "hooll"
-        this.targetWords = ["hello", "howdy", "hooll", "hoolo"]
-        $store.state.auth.registrationLoading;
+        this.guessGrid = this.$el.querySelector("[data-guess-grid]");
+        this.keyboard = this.$el.querySelector("[data-keyboard]");
+        this.alertContainer = this.$el.querySelector("[data-alert-container]"); // get the empty div container for alerts
+        this.targetWord = "hooll";
+        this.targetWords = ["hello", "howdy", "hooll", "hoolo"];
+        this.status();
     },
+    computed: {
+        status_loaded() {
+            return this.$store.state.wordle.status_loading;
+        },
+    },
+    watch: {
+        status_loaded() {
+            this.loadGuesses()
+        }
+    },
+
     data() {
         return {
+            statusLoaded: this.$store.state.wordle.status_loading,
             inputs: {
                 guess: '',
             },
@@ -114,6 +124,9 @@ export default {
             'guess',
             'status',
         ]),
+        ...mapState({
+            wordle: state=> state.wordle
+        }),
         startInteraction() { // start listening for clicks and keypresses
             document.addEventListener("click", this.handleMouseClick);
             document.addEventListener("keydown", this.handleKeyPress);
@@ -162,7 +175,6 @@ export default {
             nextTile.textContent = key // make the html the key
             nextTile.dataset.state = "active" // set it to active
             this.inputs.guess += key.toLowerCase()
-            console.log(this.inputs.guess)
         },
         deleteKey() {
             const activeTiles = this.getActiveTiles() // get array of active tiles
@@ -188,15 +200,56 @@ export default {
                 return word + tile.dataset.letter
             }, "") // returns a string
 
-            if (!this.targetWords.includes(guess)) { // when the guess isn't a real word
-                this.showAlert("Not in word list!")
-                this.shakeTiles(activeTiles)
-                return
-            }
+            this.guess({ guess: guess });
+
             this.inputs.guess = ''
 
             this.stopInteraction()
             activeTiles.forEach((...params) => this.flipTile(...params, guess)) // flip tile animation
+        },
+        loadGuesses() {
+            if (this.$store.state.wordle.status_loading == false) {
+                const guess_history = this.$store.state.wordle.info.guess_history;
+                const correct = this.$store.state.wordle.info.correct;
+                var i;
+                for (i=0; i < guess_history.length; i++) {
+                    const nextTile = this.guessGrid.querySelector(":not([data-letter])");
+                    console.log(nextTile);
+                    nextTile.textContent = guess_history[i].toLowerCase()
+                    nextTile.dataset.letter = guess_history[i].toLowerCase()
+                    if (correct[i] == "0") {
+                        nextTile.dataset.state = "wrong"
+                    }
+                    if (correct[i] == "1") {
+                        nextTile.dataset.state = "wrong-location"
+                    }
+                    if (correct[i] == "2") {
+                        nextTile.dataset.state = "correct"
+                    }
+                    
+                }
+
+
+                tile.classList.remove("flip") // remvoe flip class for animation
+                if (this.targetWord[index] === letter) {
+                    tile.dataset.state = "correct"
+                    key.classList.add("correct") // while flipping, if it's the right location and right letter, add correct class
+                } else if (this.targetWord.includes(letter)) { // otherwise if word includes letter, add wrong location class
+                    tile.dataset.state = "wrong-location"
+                    key.classList.add("wrong-location")
+                } else { // else add wrong class
+                    tile.dataset.state = "wrong"
+                    key.classList.add("wrong")
+                }
+
+                if (index === array.length - 1) { // if last tile, user can start interacting again
+                    tile.addEventListener("transitionend", () => {
+                        this.startInteraction()
+                        this.checkWinLose(guess, array)
+                    }, { once: true })
+                }
+            }
+            // this.status();
         },
         flipTile(tile, index, array, guess) {
             const letter = tile.dataset.letter

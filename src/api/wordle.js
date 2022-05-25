@@ -2,9 +2,9 @@ import session from './session';
 
 export default {
     guess(guess) {
-        return session.post('/wordle/guess/', { guess });
+        return session.post('api/v1/wordle/guess/', { guess });
     },
     status() {
-        return session.post('/wordle/status/', {});
+        return session.get('api/v1/wordle/status/', {});
     },
 };
