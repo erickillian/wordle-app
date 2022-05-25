@@ -1,7 +1,7 @@
 
 from rest_framework import serializers
 
-from ranker.core.models import Player, Event, Match, RatingHistory, CustomAccountManager
+from ranker.core.models import Player, Event, Match, RatingHistory, CustomAccountManager, DailyWordle
 from allauth.account import app_settings as allauth_settings
 from allauth.utils import email_address_exists
 from allauth.account.adapter import get_adapter
@@ -122,3 +122,9 @@ def valid_guess(guess):
 
 class WordleGuessSerializer(serializers.Serializer):
     guess = serializers.CharField(max_length=5, validators=[valid_guess])
+
+
+class DailyWordleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DailyWordle
+        fields = '__all__'

@@ -5,10 +5,12 @@ from django.utils import timezone
 
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
+from django.shortcuts import get_object_or_404
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework import viewsets
 
 from ranker.core.models import (
     Player, Event, PlayerRating, DailyWordle, ActiveWordle,
@@ -19,7 +21,8 @@ from ranker.core.serializers import (
     RatingHistorySerializer,
     MatchHistorySerializer,
     ActiveWordleSerializer,
-    WordleGuessSerializer
+    WordleGuessSerializer,
+    DailyWordleSerializer
 )
 from ranker.core.services import data
 
@@ -222,6 +225,29 @@ class WordleGuess(APIView):
             
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class WordleDetail(APIView):
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk):
+        pass
+
+class DailyWordleViewSet(viewsets.ViewSet):
+    """
+    A simple ViewSet for listing or retrieving DailyWordles.
+    """
+    def list(self, request):
+        queryset = DailyWordle.objects.all()
+        serializer = DailyWordleSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def retrieve(self, request, pk=None):
+        queryset = DailyWordle.objects.all()
+        daily_wordle = get_object_or_404(queryset, pk=pk)
+        serializer = DailyWordleSerializer(daily_wordle)
+        return Response(serializer.data)
 
 
 

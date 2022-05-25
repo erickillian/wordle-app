@@ -1,4 +1,7 @@
 from django.urls import path
+from rest_framework.routers import DefaultRouter
+from ranker.core.views import DailyWordleViewSet
+
 
 from ranker.core import views
 
@@ -14,3 +17,8 @@ urlpatterns = [
     # path('events/all', views.EventList.as_view()),
     # path('event/details/<int:event_id>', views.EventDetail.as_view())
 ]
+
+router = DefaultRouter()
+router.register(r'wordle', DailyWordleViewSet, basename='wordle')
+
+urlpatterns += router.urls
