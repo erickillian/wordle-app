@@ -250,6 +250,13 @@ class DailyWordleViewSet(viewsets.ViewSet):
         return Response(serializer.data)
 
 
+class TodayWordlePlayerWords(viewsets.ViewSet):
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = WordleGuessSerializer
+
+    #TODO: make this view
+
 
 class EventList(APIView):
     """
