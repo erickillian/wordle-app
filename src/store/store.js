@@ -6,6 +6,7 @@ import i18n from '../i18n'
 import session from '../api/session';
 import auth from './auth';
 import password from './password';
+import wordle from './wordle';
 // import signup from './signup';
 
 
@@ -14,6 +15,7 @@ Vue.use(Vuex)
 export default new Vuex.Store({
     modules: {
         auth,
+        wordle,
         password,
     },
     state: {

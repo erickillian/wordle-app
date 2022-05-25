@@ -1,6 +1,7 @@
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
+from django.utils import timezone
 
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -27,8 +28,6 @@ from ranker.settings.dev import BASE_DIR
 
 import datetime
 
-wordle_dictionary = json.load(open(os.path.join(BASE_DIR, 'ranker/core/constants/dictionary.json')))
-wordle_target_words = json.load(open(os.path.join(BASE_DIR, 'ranker/core/constants/targetWords.json')))
 
 from ranker.core.constants.wordle import WORDLE_MAX_LENGTH, WORDLE_NUM_GUESSES
 
@@ -135,48 +134,94 @@ class PlayerStats(APIView):
 
 
 
-class Wordle(APIView):
+class WordleStatus(APIView):
     authentication_classes = [SessionAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         try:
-            serializer = ActiveWordleSerializer(active_wordle)
-
-            return JsonResponse(serializer.data)(player=request.user)
-            # case where the player started a game and didnt finish
-            serializer = ActiveWordleSerializer(active_wordle)
-
-            return JsonResponse(serializer.data)
+            wordle = DailyWordle.objects.get(player=request.user, date=timezone.now().date())
+            active_wordle = ActiveWordle.objects.get(player=request.user)
+        except DailyWordle.DoesNotExist:
+            try:
+                active_wordle = ActiveWordle.objects.get(player=request.user)
+                if active_wordle.date != timezone.now().date():
+                    # If the user never completes their wordle for the day
+                    active_wordle.delete(active_wordle)
+                    wordle = DailyWordle.objects.get(player=request.user, date=timezone.now().date())
+                    guess_history = "?"*WORDLE_MAX_LENGTH*(wordle.guesses-1)+wordle.word
+                    active_wordle = ActiveWordle(word=wordle.word, guess_history=guess_history)
+                else:
+                    pass
+            except ActiveWordle.DoesNotExist:
+                active_wordle = ActiveWordle(word="?", guess_history="")
+        except ActiveWordle.DoesNotExist:
+            # this should never happen, if it does there is a problem
+            wordle = DailyWordle.objects.get(player=request.user, date=timezone.now().date())
+            guess_history = "?"*WORDLE_MAX_LENGTH*(wordle.guesses-1)+wordle.word
+            active_wordle = ActiveWordle(word=wordle.word, guess_history=guess_history)
         except:
             return Response(status=status.HTTP_404_NOT_FOUND)
+        serializer = ActiveWordleSerializer(active_wordle)
+        return Response(serializer.data)
 
-    def post(self, request, guess):
-        try:
-            active_wordle = ActiveWordle.objects.get(player=request.user)
-            wordle = DailyWordle.objects.get(player=request.user, date=datetime.date())
-
-            serializer = WordleGuessSerializer(active_wordle)
-            return JsonResponse(serializer.data)
-
-
-            # case where the player started a game and didnt finish
-            serializer = ActiveWordleSerializer(active_wordle)
-            return JsonResponse(serializer.data)
-        except ActiveWordle.DoesNotExist:
-            word = random.choice(wordle_target_words)
-            active_wordle = ActiveWordle.objects.create(player=request.user, word=word, guess_history=guess)
-
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        except DailyWordle.DoesNotExist:
-             return Response(status=status.HTTP_200_OK)
-
+    
+wordle_target_words = json.load(open(os.path.join(BASE_DIR, 'ranker/core/constants/targetWords.json')))
 
 class WordleGuess(APIView):
     authentication_classes = [SessionAuthentication]
     permission_classes = [IsAuthenticated]
+    serializer_class = WordleGuessSerializer
 
-    
+    def post(self, request):
+        serializer = WordleGuessSerializer(data=request.data)
+        if serializer.is_valid():
+            try:
+                active_wordle = ActiveWordle.objects.get(player=request.user)
+                if active_wordle.date != timezone.now().date():
+                    active_wordle.delete()
+                    return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
+                else:
+                    if active_wordle.guesses < WORDLE_NUM_GUESSES:
+                        active_wordle.guess_history += request.data['guess']
+                        if active_wordle.guesses <= WORDLE_NUM_GUESSES:
+                            active_wordle.save()
+                        print(timezone.now()-active_wordle.start_time, flush=True)
+
+                        if active_wordle.solved:
+                            DailyWordle.objects.create(
+                                player=request.user, 
+                                word=active_wordle.word,
+                                guesses=active_wordle.guesses,
+                                date=active_wordle.date,
+                                time=timezone.now()-active_wordle.start_time,
+                                fail=False
+                            )
+                        if active_wordle.guesses == WORDLE_NUM_GUESSES:
+                            DailyWordle.objects.create(
+                                player=request.user, 
+                                word=active_wordle.word,
+                                guesses=active_wordle.guesses,
+                                date=active_wordle.date,
+                                time=timezone.now()-active_wordle.start_time,
+                                fail=True
+                            )
+                serializer = ActiveWordleSerializer(active_wordle)
+                return Response(serializer.data)
+
+            except ActiveWordle.DoesNotExist:
+                word = random.choice(wordle_target_words)
+                active_wordle = ActiveWordle.objects.create(player=request.user, guess_history=request.data['guess'], word=word)
+                serializer = ActiveWordleSerializer(active_wordle)
+                return Response(serializer.data)
+            except:
+                print("bass request2", flush=True)
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
+
+            
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 

@@ -81,7 +81,7 @@
         
 
 <script>
-
+import { mapActions, mapState } from 'vuex';
 
 // CONSTANTS
 const WORD_LENGTH = 5;
@@ -99,19 +99,21 @@ export default {
         this.alertContainer = this.$el.querySelector("[data-alert-container]") // get the empty div container for alerts
         this.targetWord = "hooll"
         this.targetWords = ["hello", "howdy", "hooll", "hoolo"]
+        $store.state.auth.registrationLoading;
     },
-    // data: function () {
-    //     this.keyboard = keyboard;
-    //     this.alertContainer = alertContainer;
-    //     this.guessGrid = guessGrid;
-    //     this.offsetFromDate = offsetFromDate;
-    //     this.msOffset = msOffset;
-    //     this.datOffset = dayOffset;
-    //     this.targetWord = targetWord;
-    //     this.targetWords = targetWords;
-    // },
+    data() {
+        return {
+            inputs: {
+                guess: '',
+            },
+        };
+    },
     // mounted: this.startInteraction(),
     methods: {
+        ...mapActions('wordle', [
+            'guess',
+            'status',
+        ]),
         startInteraction() { // start listening for clicks and keypresses
             document.addEventListener("click", this.handleMouseClick);
             document.addEventListener("keydown", this.handleKeyPress);
@@ -159,6 +161,8 @@ export default {
             nextTile.dataset.letter = key.toLowerCase() // add the letter to the tile's dataset
             nextTile.textContent = key // make the html the key
             nextTile.dataset.state = "active" // set it to active
+            this.inputs.guess += key.toLowerCase()
+            console.log(this.inputs.guess)
         },
         deleteKey() {
             const activeTiles = this.getActiveTiles() // get array of active tiles
@@ -167,6 +171,7 @@ export default {
             lastTile.textContent = "" // set the text content to an empty string
             delete lastTile.dataset.state // delete active state
             delete lastTile.dataset.letter // delete letter dataset
+            this.inputs.guess = this.inputs.guess.slice(0, -1)
         },
         getActiveTiles() {
             return this.guessGrid.querySelectorAll('[data-state="active"]')
@@ -188,6 +193,7 @@ export default {
                 this.shakeTiles(activeTiles)
                 return
             }
+            this.inputs.guess = ''
 
             this.stopInteraction()
             activeTiles.forEach((...params) => this.flipTile(...params, guess)) // flip tile animation

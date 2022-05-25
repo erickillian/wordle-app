@@ -90,20 +90,23 @@ class Player(AbstractBaseUser, PermissionsMixin):
 
 class ActiveWordle(models.Model):
     player = models.OneToOneField(Player, on_delete=models.CASCADE)
-    start_time = models.DateTimeField(auto_now_add=timezone.now())
+    start_time = models.DateTimeField(auto_now_add=True)
     guess_history = models.CharField(max_length=WORDLE_MAX_LENGTH*WORDLE_NUM_GUESSES, blank=True)
     word = models.CharField(max_length=WORDLE_MAX_LENGTH, blank=False)
 
     @property
     def solved(self):
-        return self.guess_history[WORDLE_MAX_LENGTH:] is self.word
+        return self.guess_history[-WORDLE_MAX_LENGTH:] == self.word
+
+    @property
+    def date(self):
+        return self.start_time.date()
 
     @property
     def correct(self):
         correct = ""
         for i in range(0, int(len(self.guess_history) / WORDLE_MAX_LENGTH)):
             guess = self.guess_history[i*WORDLE_MAX_LENGTH:(i+1)*WORDLE_MAX_LENGTH]
-            print(guess)
             j = 0
             for j in range(0, WORDLE_MAX_LENGTH):
                 if self.word[j] == guess[j]:
@@ -141,9 +144,9 @@ class DailyWordle(models.Model):
     player = models.ForeignKey(Player, default=None,on_delete=models.CASCADE)
     word = models.CharField(max_length=5, blank=False)
     guesses = models.PositiveSmallIntegerField(blank=False)
-    date = models.DateField(auto_now_add=timezone.now(), blank=False)
+    date = models.DateField(auto_now_add=True, blank=False)
     time = models.DurationField()
-
+    fail = models.BooleanField(blank=False)
     class Meta:
         db_table = 'wordle'
         verbose_name = ('wordle')
@@ -156,7 +159,7 @@ class Match(models.Model):
     winning_score = models.IntegerField(default=None)
     loser = models.ForeignKey(Player, default=None, related_name='lost_matches', on_delete=models.CASCADE)
     losing_score = models.IntegerField(default=None)
-    datetime = models.DateTimeField(default=timezone.now)
+    datetime = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         """Display match description as string object representation."""
