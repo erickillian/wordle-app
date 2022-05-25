@@ -9,6 +9,9 @@ from allauth.account.utils import setup_user_email
 
 from django.contrib.auth import get_user_model
 
+import json, os
+from ranker.settings.dev import BASE_DIR
+
 class RegisterSerializer(serializers.Serializer):
     email = serializers.EmailField(required=allauth_settings.EMAIL_REQUIRED)
     username = serializers.CharField(required=True, write_only=True)
@@ -107,12 +110,16 @@ class ActiveWordleSerializer(serializers.Serializer):
     guess_history = serializers.CharField(max_length=30)
     solved = serializers.BooleanField()
     start_time = serializers.DateTimeField()
+    correct = serializers.CharField(max_length=30)
 
     class Meta:
         exclude = ['word']
 
+wordle_dictionary = json.load(open(os.path.join(BASE_DIR, 'ranker/core/constants/dictionary.json')))
+def valid_guess(guess):
+    if guess not in wordle_dictionary:
+        raise serializers.ValidationError('Guess not a valid word')
+
 
 class WordleGuessSerializer(serializers.Serializer):
-    solved = serializers.BooleanField()
-    guess_history = serializers.CharField(max_length=30)
-    start_time = serializers.DateTimeField()
+    guess = serializers.CharField(max_length=5, validators=[valid_guess])
