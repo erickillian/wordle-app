@@ -7,6 +7,7 @@ import {
     WORDLE_GUESS_BEGIN,
     WORDLE_GUESS_ERROR,
     WORDLE_GUESS_SUCCESS,
+    WORDLE_GUESS_RESPONDED,
 } from './types';
 
 
@@ -15,6 +16,8 @@ const initialState = {
     status_loading: true,
     status_error: false,
     guess_loading: false,
+    guess_error: false,
+    guess_ok: false,
     guess_error: false,
     info: {
         guesses: 0,
@@ -79,11 +82,17 @@ const mutations = {
         state.guess_error = false
     },
     [WORDLE_GUESS_SUCCESS](state, data) {
+        state.guess_ok = true
         state.guess_loading = false
         state.guess_error = false
         state.info = data
     },
+    [WORDLE_GUESS_RESPONDED](state) {
+        state.guess_ok = false
+        state.guess_error = false
+    },
     [WORDLE_GUESS_ERROR](state, error) {
+        state.guess_error = true
         state.guess_loading = false
         state.guess_error = true
         state.errors = error
