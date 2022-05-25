@@ -11,6 +11,7 @@ import {
 
 
 const initialState = {
+    initial_load: false,
     status_loading: true,
     status_error: false,
     guess_loading: false,
@@ -59,10 +60,12 @@ const actions = {
 
 const mutations = {
     [WORDLE_STATUS_BEGIN](state) {
+        state.initial_load = false
         state.status_loading = true
         state.status_error = false
     },
     [WORDLE_STATUS_SUCCESS](state, data) {
+        state.initial_load = true
         state.status_loading = false
         state.status_error = false
         state.info = data
