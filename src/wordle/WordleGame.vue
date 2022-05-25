@@ -100,14 +100,20 @@ export default {
         this.status();
     },
     computed: {
-        status_loaded() {
-            return this.$store.state.wordle.status_loading;
+        initial_load() {
+            return this.$store.state.wordle.initial_load;
+        },
+        guess_loaded() {
+            return this.$store.state.wordle.guess_loading;
         },
     },
     watch: {
-        status_loaded() {
+        initial_load() {
             this.loadGuesses()
-        }
+        },
+        guess_loaded() {
+            this.newGuess()
+        },
     },
 
     data() {
@@ -211,10 +217,8 @@ export default {
             if (this.$store.state.wordle.status_loading == false) {
                 const guess_history = this.$store.state.wordle.info.guess_history;
                 const correct = this.$store.state.wordle.info.correct;
-                var i;
-                for (i=0; i < guess_history.length; i++) {
+                for (var i=0; i < guess_history.length; i++) {
                     const nextTile = this.guessGrid.querySelector(":not([data-letter])");
-                    console.log(nextTile);
                     nextTile.textContent = guess_history[i].toLowerCase()
                     nextTile.dataset.letter = guess_history[i].toLowerCase()
                     if (correct[i] == "0") {
@@ -227,29 +231,40 @@ export default {
                         nextTile.dataset.state = "correct"
                     }
                     
+                    setTimeout(() => {
+                        nextTile.classList.add("bounce")
+                        nextTile.addEventListener(
+                            "animationend",
+                            () => {
+                                nextTile.classList.remove("bounce")
+                            },
+                            { once: true }
+                        )
+                    }, (i * DANCE_ANIMATION_DURATION*.75) / 7)
                 }
+                // tile.classList.remove("flip") // remvoe flip class for animation
+                // if (this.targetWord[index] === letter) {
+                //     tile.dataset.state = "correct"
+                //     key.classList.add("correct") // while flipping, if it's the right location and right letter, add correct class
+                // } else if (this.targetWord.includes(letter)) { // otherwise if word includes letter, add wrong location class
+                //     tile.dataset.state = "wrong-location"
+                //     key.classList.add("wrong-location")
+                // } else { // else add wrong class
+                //     tile.dataset.state = "wrong"
+                //     key.classList.add("wrong")
+                // }
 
-
-                tile.classList.remove("flip") // remvoe flip class for animation
-                if (this.targetWord[index] === letter) {
-                    tile.dataset.state = "correct"
-                    key.classList.add("correct") // while flipping, if it's the right location and right letter, add correct class
-                } else if (this.targetWord.includes(letter)) { // otherwise if word includes letter, add wrong location class
-                    tile.dataset.state = "wrong-location"
-                    key.classList.add("wrong-location")
-                } else { // else add wrong class
-                    tile.dataset.state = "wrong"
-                    key.classList.add("wrong")
-                }
-
-                if (index === array.length - 1) { // if last tile, user can start interacting again
-                    tile.addEventListener("transitionend", () => {
-                        this.startInteraction()
-                        this.checkWinLose(guess, array)
-                    }, { once: true })
-                }
+                // if (index === array.length - 1) { // if last tile, user can start interacting again
+                //     tile.addEventListener("transitionend", () => {
+                //         this.startInteraction()
+                //         this.checkWinLose(guess, array)
+                //     }, { once: true })
+                // }
             }
             // this.status();
+        },
+        newGuess(guess, correct) {
+
         },
         flipTile(tile, index, array, guess) {
             const letter = tile.dataset.letter
