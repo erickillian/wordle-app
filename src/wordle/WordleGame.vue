@@ -219,8 +219,6 @@ export default {
             }, "") // returns a string
 
             this.guess({ guess: guess });
-            console.log("Submitting Guess")
-
             this.stopInteraction()
             // activeTiles.forEach((...params) => this.flipTile(...params, guess)) // flip tile animation
         },
@@ -253,26 +251,11 @@ export default {
                         )
                     }, (i * DANCE_ANIMATION_DURATION*.75) / 7)
                 }
-                // tile.classList.remove("flip") // remvoe flip class for animation
-                // if (this.targetWord[index] === letter) {
-                //     tile.dataset.state = "correct"
-                //     key.classList.add("correct") // while flipping, if it's the right location and right letter, add correct class
-                // } else if (this.targetWord.includes(letter)) { // otherwise if word includes letter, add wrong location class
-                //     tile.dataset.state = "wrong-location"
-                //     key.classList.add("wrong-location")
-                // } else { // else add wrong class
-                //     tile.dataset.state = "wrong"
-                //     key.classList.add("wrong")
-                // }
-
-                // if (index === array.length - 1) { // if last tile, user can start interacting again
-                //     tile.addEventListener("transitionend", () => {
-                //         this.startInteraction()
-                //         this.checkWinLose(guess, array)
-                //     }, { once: true })
-                // }
+                if (this.$store.state.wordle.info.solved == true) {
+                    console.log("solved")
+                    this.stopInteraction()
+                }
             }
-            // this.status();
         },
         guessOk() {
             const guess = this.$store.state.wordle.info.guess_history.slice(-WORD_LENGTH);
@@ -281,13 +264,19 @@ export default {
 
             const activeTiles = [...this.getActiveTiles()]
             activeTiles.forEach((...params) => this.flipTile(...params, guess, correct)) // flip tile animation
+            if (this.$store.state.wordle.info.solved == true) {
+                console.log("solved")
+                this.stopInteraction()
+            } else {
+                this.startInteraction()
+            }
 
         },
         guessError() {
             this.startInteraction()
-            console.log("guess error")
             const activeTiles = [...this.getActiveTiles()]
             this.shakeTiles(activeTiles)// flip tile animation
+            this.showAlert("Guess Error")
 
         },
         flipTile(tile, index, array, guess, correct) {
