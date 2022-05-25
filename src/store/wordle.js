@@ -11,8 +11,19 @@ import {
 
 
 const initialState = {
-    guess: '',
-    correct: '',
+    status_loading: true,
+    status_error: false,
+    guess_loading: false,
+    guess_error: false,
+    info: {
+        guesses: 0,
+        guess_history: '',
+        solved: false,
+        start_time: '',
+        correct: '',
+    },
+    errors: {}
+
     // registration_error: {
     //     username: '',
     //     firstname: '',
@@ -34,13 +45,13 @@ const getters = {
 const actions = {
     status({ commit }) {
         commit(WORDLE_STATUS_BEGIN);
-        return wordle.status(username, password)
+        return wordle.status()
             .then(({ data }) => commit(WORDLE_STATUS_SUCCESS, data))
             .catch((error) => commit(WORDLE_STATUS_ERROR, error.response.data));
     },
     guess({ commit }, { guess }) {
         commit(WORDLE_GUESS_BEGIN);
-        return wordle.guess(username, password)
+        return wordle.guess(guess)
             .then(({ data }) => commit(WORDLE_GUESS_SUCCESS, data))
             .catch((error) => commit(WORDLE_GUESS_ERROR, error.response.data));
     },
@@ -48,22 +59,31 @@ const actions = {
 
 const mutations = {
     [WORDLE_STATUS_BEGIN](state) {
-
+        state.status_loading = true
+        state.status_error = false
     },
     [WORDLE_STATUS_SUCCESS](state, data) {
-        console.log(data)
+        state.status_loading = false
+        state.status_error = false
+        state.info = data
     },
     [WORDLE_STATUS_ERROR](state, error) {
-        console.log(error)
+        state.status_error = true
+        state.status_loading = false
     },
     [WORDLE_GUESS_BEGIN](state) {
-
+        state.guess_loading = true
+        state.guess_error = false
     },
     [WORDLE_GUESS_SUCCESS](state, data) {
-        console.log(data)
+        state.guess_loading = false
+        state.guess_error = false
+        state.info = data
     },
     [WORDLE_GUESS_ERROR](state, error) {
-        console.log(error)
+        state.guess_loading = false
+        state.guess_error = true
+        state.errors = error
     },
 };
 

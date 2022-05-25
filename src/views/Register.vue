@@ -109,17 +109,13 @@
                               color="primary"
                               class="mr-4"
                               @click="createAccount(inputs)"
-                              :loading=$store.state.auth.registrationLoading
+                              :loading="$store.state.auth.registrationLoading"
                             >
                               Create Account
                             </v-btn>
                         </v-form>
                      </v-card-text>
-                     <!-- <v-card-actions>
-                        <v-spacer></v-spacer>
-                        <v-btn @submit="login(inputs)" @click="login(inputs)" color="primary" to="/">Login</v-btn>
-                     </v-card-actions> -->
-                      <router-link to="/login">return to login page</router-link>
+                    <router-link to="/login">return to login page</router-link>
                   </v-card>
                </v-flex>
             </v-layout>
