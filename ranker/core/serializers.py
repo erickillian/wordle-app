@@ -57,7 +57,6 @@ class RegisterSerializer(serializers.Serializer):
     def save(self, request):
         account_manager = CustomAccountManager
         cleaned_data = self.get_cleaned_data()
-        print(cleaned_data)
         user = account_manager.create_user(self, **cleaned_data)
         return user
 

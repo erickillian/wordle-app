@@ -181,13 +181,13 @@ class WordleGuess(APIView):
                 if active_wordle.date != timezone.now().date():
                     active_wordle.delete()
                     return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
+                elif active_wordle.solved == True:
+                    return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
                 else:
                     if active_wordle.guesses < WORDLE_NUM_GUESSES:
                         active_wordle.guess_history += request.data['guess']
                         if active_wordle.guesses <= WORDLE_NUM_GUESSES:
                             active_wordle.save()
-                        print(timezone.now()-active_wordle.start_time, flush=True)
-
                         if active_wordle.solved:
                             DailyWordle.objects.create(
                                 player=request.user, 
