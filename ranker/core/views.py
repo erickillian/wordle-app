@@ -150,17 +150,12 @@ class WordleStatus(APIView):
                 active_wordle = ActiveWordle.objects.get(player=request.user)
                 if active_wordle.date != timezone.now().date():
                     # If the user never completes their wordle for the day
-                    active_wordle.delete(active_wordle)
-                    wordle = DailyWordle.objects.get(player=request.user, date=timezone.now().date())
-                    guess_history = "?"*WORDLE_MAX_LENGTH*(wordle.guesses-1)+wordle.word
-                    active_wordle = ActiveWordle(word=wordle.word, guess_history=guess_history)
-                else:
-                    pass
+                    active_wordle.delete()
+                    active_wordle = ActiveWordle(word="?", guess_history="")
             except ActiveWordle.DoesNotExist:
                 active_wordle = ActiveWordle(word="?", guess_history="")
         except ActiveWordle.DoesNotExist:
             # this should never happen, if it does there is a problem
-            wordle = DailyWordle.objects.get(player=request.user, date=timezone.now().date())
             guess_history = "?"*WORDLE_MAX_LENGTH*(wordle.guesses-1)+wordle.word
             active_wordle = ActiveWordle(word=wordle.word, guess_history=guess_history)
         except:
@@ -250,13 +245,16 @@ class DailyWordleViewSet(viewsets.ViewSet):
         return Response(serializer.data)
 
 
-class TodayWordlePlayerWords(viewsets.ViewSet):
+class WordlesToday(APIView):
     authentication_classes = [SessionAuthentication]
     permission_classes = [IsAuthenticated]
-    serializer_class = WordleGuessSerializer
+    serializer_class = DailyWordleSerializer
 
     #TODO: make this view
-
+    def get(self, request):
+        queryset = DailyWordle.objects.filter(date=timezone.now().date())
+        serializer = DailyWordleSerializer(queryset, many=True)
+        return Response(serializer.data)
 
 class EventList(APIView):
     """

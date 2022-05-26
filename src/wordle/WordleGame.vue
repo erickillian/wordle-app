@@ -95,8 +95,6 @@ export default {
         this.guessGrid = this.$el.querySelector("[data-guess-grid]");
         this.keyboard = this.$el.querySelector("[data-keyboard]");
         this.alertContainer = this.$el.querySelector("[data-alert-container]"); // get the empty div container for alerts
-        this.targetWord = "hooll";
-        this.targetWords = ["hello", "howdy", "hooll", "hoolo"];
         this.status();
     },
     computed: {
@@ -302,7 +300,6 @@ export default {
                 if (index === array.length - 1) { // if last tile, user can start interacting again
                     tile.addEventListener("transitionend", () => {
                         this.startInteraction()
-                        this.checkWinLose(guess, array)
                     }, { once: true })
                 }
             }, { once: true })
@@ -329,7 +326,7 @@ export default {
             })
         },
         checkWinLose(guess, tiles) {
-            if (guess === this.targetWord) {
+            if (true) {
                 this.showAlert("Wow! You've won! I didn't think you could do it!", 5000)
                 this.danceTiles(tiles)
                 this.stopInteraction()
@@ -340,7 +337,7 @@ export default {
 
             if (remainingTiles.length === 0) { // if no more remaining tiles
                 this.showAlert("🚨LOSER DETECTED!🚨")
-                this.showAlert(`The word was: ${this.targetWord.toUpperCase()}`, null)
+                this.showAlert(`The word was: }`, null)
                 this.stopInteraction()
             }
         },

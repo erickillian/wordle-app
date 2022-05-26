@@ -27,19 +27,6 @@ const initialState = {
         correct: '',
     },
     errors: {}
-
-    // registration_error: {
-    //     username: '',
-    //     firstname: '',
-    //     lastname: '',
-    //     email: '',
-    //     password1: '',
-    //     password2: '',
-    // },
-    // login_error: {
-    //     username: '',
-    //     password: ''
-    // }
 };
 
 const getters = {
