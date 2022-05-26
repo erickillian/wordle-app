@@ -7,4 +7,7 @@ export default {
     status() {
         return session.get('api/v1/wordle/status/', {});
     },
+    today() {
+        return session.get('api/v1/wordle/today/', {});
+    },
 };

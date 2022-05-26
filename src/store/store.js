@@ -7,6 +7,7 @@ import session from '../api/session';
 import auth from './auth';
 import password from './password';
 import wordle from './wordle';
+import leaderboards from './leaderboards';
 // import signup from './signup';
 
 
@@ -17,6 +18,7 @@ export default new Vuex.Store({
         auth,
         wordle,
         password,
+        leaderboards,
     },
     state: {
         isLoading: false,
@@ -29,7 +31,10 @@ export default new Vuex.Store({
             leaders: [],
             weekly: {},
             maxes: [],
-            totals: []
+            totals: [],
+            wordle: {
+                today: [],
+            }
         },
         player: {
             list: {
@@ -112,7 +117,7 @@ export default new Vuex.Store({
         },
         SET_EVENT_DETAILS(state, eventInfo) {
             state.event.details.info = eventInfo
-        }
+        },
     },
     actions: {
         fetchLeaderboard(context) {

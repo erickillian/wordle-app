@@ -125,6 +125,7 @@ class WordleGuessSerializer(serializers.Serializer):
 
 
 class DailyWordleSerializer(serializers.ModelSerializer):
+    player_name = serializers.CharField(source='player.full_name', read_only=True)
     class Meta:
         model = DailyWordle
         fields = '__all__'

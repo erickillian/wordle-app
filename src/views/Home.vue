@@ -1,23 +1,35 @@
 <template>
-  <v-row class="ma-0" style="height: 100%">
+  <v-row class="ma-0">
     <v-col>
-      <v-row class="mb-3">
-        <v-col
-          class="pt-0"
-          v-for="total in $store.state.lb.totals"
-          :key="total.id"
-        >
-          <BigNumberCard :total="total" />
-        </v-col>
-      </v-row>
-      <v-row class="mb-3">
-        <v-col class="pt-0">
-          <LeadersCard
-            :title="$t('leaderboard.top')"
-            :leaders="$store.state.lb.leaders"
-          />
-        </v-col>
-      </v-row>
+        <v-row class="mb-3">
+            <v-col
+                class="pt-0"
+                v-for="total in $store.state.lb.totals"
+                :key="total.id"
+            >
+                <BigNumberCard 
+                    :total="total"
+                />
+            </v-col>
+        </v-row>
+
+        <v-row class="mb-3">
+            <v-col class="pt-0">
+                <LeadersCard
+                :title="$t('leaderboard.top')"
+                :leaders="$store.state.lb.leaders"
+                />
+            </v-col>
+        </v-row>
+        <v-row class="mb-3">
+            <v-col class="pt-0">
+                <TodayWordlesCard
+                    title="Wordles"
+                    :wordles="$store.state.leaderboards.wordle.today"
+                />
+            </v-col>
+        </v-row>
+        
     </v-col>
     <v-col>
       <SimpleCard
@@ -69,12 +81,14 @@ import axios from "axios";
 import SimpleCard from "../components/leaderboard/SimpleCard";
 import LeadersCard from "../components/leaderboard/LeadersCard";
 import BigNumberCard from "../components/leaderboard/BigNumberCard";
+import TodayWordlesCard from "../components/leaderboard/TodayWordlesCard";
 
 export default {
   name: "home",
-  components: { SimpleCard, LeadersCard, BigNumberCard },
+  components: { SimpleCard, LeadersCard, BigNumberCard, TodayWordlesCard },
   created() {
     this.$store.dispatch("fetchLeaderboard");
+    this.$store.dispatch("leaderboards/todaysWordles");
   },
 };
 </script>
