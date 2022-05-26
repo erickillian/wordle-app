@@ -144,10 +144,12 @@ export default {
     'registrationError',
     'registrationLoading',
   ]),
-  methods: mapActions('auth', [
-    'createAccount',
-    'clearRegistrationStatus',
-  ]),
+  methods: {
+    createAccount({ username, firstname, lastname, email, password1, password2 }) {
+      this.$store.dispatch('auth/createAccount', { username, firstname, lastname, email, password1, password2 })
+        .then(() => this.$router.push('/'));
+    },
+  },
   beforeRouteLeave(to, from, next) {
     this.clearRegistrationStatus();
     next();

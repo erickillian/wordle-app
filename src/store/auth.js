@@ -77,6 +77,7 @@ const actions = {
     createAccount({ commit }, { username, firstname, lastname, email, password1, password2 }) {
         commit(REGISTRATION_BEGIN);
         return auth.createAccount(username, firstname, lastname, email, password1, password2)
+            .then(({ data }) => commit(SET_TOKEN, data.key))
             .then(() => commit(REGISTRATION_SUCCESS))
             .catch((error) => commit(REGISTRATION_ERROR, error.response.data));
     },
