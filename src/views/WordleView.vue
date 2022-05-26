@@ -7,7 +7,7 @@ import axios from "axios";
 import WordleGame from "../wordle/WordleGame";
 
 export default {
-  name: "home",
+  name: "WordleView",
   components: { WordleGame},
   created() {
     this.$store.dispatch("fetchLeaderboard");

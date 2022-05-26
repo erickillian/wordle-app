@@ -84,7 +84,7 @@ import BigNumberCard from "../components/leaderboard/BigNumberCard";
 import TodayWordlesCard from "../components/leaderboard/TodayWordlesCard";
 
 export default {
-  name: "home",
+  name: "HomeView",
   components: { SimpleCard, LeadersCard, BigNumberCard, TodayWordlesCard },
   created() {
     this.$store.dispatch("fetchLeaderboard");

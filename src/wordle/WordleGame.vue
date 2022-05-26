@@ -87,7 +87,7 @@ const FLIP_ANIMATION_DURATION = 750
 const DANCE_ANIMATION_DURATION = 500
 
 export default {
-    name: "wordle",
+    name: "WordleGame",
     // components: { SimpleCard, LeadersCard, BigNumberCard },
     mounted() {
         document.addEventListener("click", this.handleMouseClick);

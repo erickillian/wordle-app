@@ -57,14 +57,15 @@
 
 <script>
 export default {
-  data() {
-    return {
-      inputs: {
-        username: '',
-        password: '',
-      },
-    };
-  },
+   name: "LoginView",
+   data() {
+      return {
+         inputs: {
+         username: '',
+         password: '',
+         },
+      };
+   },
   methods: {
     login({ username, password }) {
       this.$store.dispatch('auth/login', { username, password })

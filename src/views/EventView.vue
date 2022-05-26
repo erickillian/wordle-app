@@ -19,10 +19,10 @@
           <v-list three-line>
             <v-list-item-group v-if="filteredEvents.length" color="primary">
               <v-divider />
-              <template v-for="item in filteredEvents">
                 <v-list-item
                   :key="item.id"
                   @click="onEventClick(item.id)"
+                  v-for="item in filteredEvents"
                 >
                   <v-list-item-action class="my-auto">
                     <v-icon>mdi-bank</v-icon>
@@ -44,7 +44,6 @@
 
                 </v-list-item>
                 <v-divider :key="item.title"/>
-              </template>
             </v-list-item-group>
             <v-list-item class="text-center" v-else>
               <v-list-item-title>
@@ -89,7 +88,7 @@
 import EventCard from '@/components/EventCard'
 
 export default {
-  name: "events",
+  name: "EventView",
   components: { EventCard },
   data() {
     return {

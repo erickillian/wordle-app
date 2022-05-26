@@ -1,3 +1,4 @@
+
 <template>
   <div id="password-reset-view">
     <h1>Reset Password</h1>

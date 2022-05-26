@@ -53,7 +53,7 @@ import PlayerList from "../components/PlayerList"
 import PlayerCard from "../components/PlayerCard"
 
 export default {
-  name: "players",
+  name: "PlayersView",
   components: { PlayerCard, PlayerList },
   data() {
     return {

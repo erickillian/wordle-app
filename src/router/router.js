@@ -1,17 +1,17 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 
-import Home from '../views/Home.vue'
-import Players from '../views/Players.vue'
-import Events from '../views/Events.vue'
-import Wordle from '../views/Wordle';
-import NotFound from '../views/NotFound.vue'
-import Login from '../views/Login';
-import Lost from '../views/Lost';
-import PasswordReset from '../views/PasswordReset';
-import PasswordResetConfirm from '../views/PasswordResetConfirm';
-import Register from '../views/Register';
-import VerifyEmail from '../views/VerifyEmail';
+import HomeView from '../views/HomeView'
+import PlayersView from '../views/PlayersView'
+import EventsView from '../views/EventView'
+import WordleView from '../views/WordleView';
+import NotFoundView from '../views/NotFoundView'
+import LoginView from '../views/LoginView';
+import LostView from '../views/LostView';
+import PasswordResetView from '../views/PasswordResetView';
+import PasswordResetConfirmView from '../views/PasswordResetConfirmView';
+import RegisterView from '../views/RegisterView';
+import VerifyEmailView from '../views/VerifyEmailView';
 
 import store from '../store/store';
 
@@ -52,7 +52,7 @@ export default new Router({
             path: '/login',
             name: 'login',
             meta: { layout: 'empty-layout' },
-            component: Login,
+            component: LoginView,
             beforeEnter: requireUnauthenticated,
         },
         {
@@ -65,55 +65,55 @@ export default new Router({
             path: '/password_reset',
             name: 'password_reset',
             meta: { layout: 'empty-layout' },
-            component: PasswordReset,
+            component: PasswordResetView,
         },
         {
             path: '/password_reset/:uid/:token',
             name: 'password_reset_confirm',
             meta: { layout: 'empty-layout' },
-            component: PasswordResetConfirm,
+            component: PasswordResetConfirmView,
         },
         {
             path: '/register',
             name: 'register',
             meta: { layout: 'empty-layout' },
-            component: Register,
+            component: RegisterView,
         },
         {
             path: '/register/:key',
             name: 'verify_email',
             meta: { layout: 'empty-layout' },
-            component: VerifyEmail,
+            component: VerifyEmailView,
         },
         {
             path: '/',
             name: 'home',
             meta: { layout: 'main-layout' },
-            component: Home,
+            component: HomeView,
             beforeEnter: requireAuthenticated,
         },
         {
             path: '/players/:id?',
             name: 'players',
             meta: { layout: 'main-layout' },
-            component: Players,
+            component: PlayersView,
             beforeEnter: requireAuthenticated,
         },
         {
             path: '/wordle',
             name: 'wordle',
             meta: { layout: 'main-layout' },
-            component: Wordle,
+            component: WordleView,
             beforeEnter: requireAuthenticated,
         },
         {
             path: '/events/:id?',
             name: 'events',
             meta: { layout: 'main-layout' },
-            component: Events,
+            component: EventsView,
             beforeEnter: requireAuthenticated,
         },
-        { path: '/404', meta: { layout: 'empty-layout' }, component: NotFound },
+        { path: '/404', meta: { layout: 'empty-layout' }, component: NotFoundView },
         { path: '*', redirect: '/404' }
     ]
 })
