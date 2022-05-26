@@ -8,6 +8,7 @@ db.sqlite3
 *.ipynb
 staticfiles
 node_modules
+data/
 
 .DS_Store
 node_modules

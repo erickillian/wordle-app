@@ -1,0 +1,17 @@
+FROM node:latest
+
+WORKDIR /code
+
+COPY package.json /code
+COPY package-lock.json /code
+
+RUN npm install --legacy-peer-deps
+
+RUN mkdir src
+COPY /src /code/src
+COPY vue.config.js /code
+COPY .eslintrc.js /code
+
+RUN npm run build
+
+# CMD ["npm", "run", "serve", "--", "--port", "3000"]

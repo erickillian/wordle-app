@@ -14,18 +14,30 @@ services:
             - POSTGRES_PASSWORD=password
         volumes:
             - ./data/db:/var/lib/postgresql/data
+    npm:
+        build:
+            context: .
+            dockerfile: Dockerfile-frontend
+        restart: 'always'
+        networks:
+            djangonetwork:
+        volumes:
+            - ./dist:/code/dist
+        ports:
+            - '3000:3000'
+        command: "npm run serve -- --port 3000"
     web:
         build:
             context: .
-            dockerfile: Dockerfile
+            dockerfile: Dockerfile-backend
         ports:
             - '80:80'
-            - '3000:3000'
         restart: 'always'
         volumes:
             - .:/code
         depends_on:
             - db
+            - npm
         links:
             - db:db
         networks:

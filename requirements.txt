@@ -1,5 +1,5 @@
-Django==3.0.3
-djangorestframework==3.10.3
+Django==4.0.3
+djangorestframework==3.13.1
 psycopg2-binary==2.9.3
 dj_database_url==0.5.0
 pandas==1.4.2
