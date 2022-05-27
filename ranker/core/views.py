@@ -195,7 +195,7 @@ class WordleGuess(APIView):
                                 time=timezone.now()-active_wordle.start_time,
                                 fail=False
                             )
-                        if active_wordle.guesses == WORDLE_NUM_GUESSES:
+                        elif active_wordle.guesses == WORDLE_NUM_GUESSES:
                             DailyWordle.objects.create(
                                 player=request.user, 
                                 word=active_wordle.word,
@@ -250,9 +250,19 @@ class WordlesToday(APIView):
     permission_classes = [IsAuthenticated]
     serializer_class = DailyWordleSerializer
 
-    #TODO: make this view
     def get(self, request):
         queryset = DailyWordle.objects.filter(date=timezone.now().date())
+        serializer = DailyWordleSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+
+class WordleWallOfShame(APIView):
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = DailyWordleSerializer
+
+    def get(self, request):
+        queryset = DailyWordle.objects.filter(fail=True)
         serializer = DailyWordleSerializer(queryset, many=True)
         return Response(serializer.data)
 

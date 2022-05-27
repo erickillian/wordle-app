@@ -24,7 +24,7 @@
         <v-row class="mb-3">
             <v-col class="pt-0">
                 <TodayWordlesCard
-                    title="Todays Wordle"
+                    title="Todays Convergles"
                     :wordles="$store.state.leaderboards.wordle.today"
                 />
             </v-col>

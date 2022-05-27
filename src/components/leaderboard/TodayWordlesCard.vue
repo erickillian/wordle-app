@@ -4,44 +4,46 @@
         <v-icon left>mdi-trophy</v-icon>
         {{ title }}
         </v-subheader>
-        <v-list flat dense>
-            <v-list-item-group>
-        <v-row
-          dense
-          align="center"
-          justify="center"
-          v-for="(wordle) in wordles"
-          :key="wordle.id"
-          @click="playerClick(wordle.player)"
+        <v-data-table
+          :headers="headers"
+          :items=wordles
+          :items-per-page="5"
+          class="elevation-1"
         >
-          <v-col>
-            <v-list-item>
-              <v-list-item-content>
-                <v-list-item-title>
-                  {{ wordle.player_name }}
-                </v-list-item-title>
-              </v-list-item-content>
-              <v-list-item-content>
-                <v-list-item-title>
-                  {{ wordle.guesses }}
-                </v-list-item-title>
-              </v-list-item-content>
-              <v-list-item-content>
-                <v-list-item-title>
-                  {{ wordle.word }}
-                </v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-          </v-col>
-        </v-row>
-      </v-list-item-group>
-        </v-list>
+          <template v-slot:[`item.guesses`]="{ item }">
+            <v-chip
+              :color="getColor(item.fail)"
+              dark
+            >
+              {{ item.guesses }}
+            </v-chip>
+          </template>
+        </v-data-table>
     </v-card>
 </template>
 
 <script>
 
 export default {
+  data () {
+      return {
+        headers: [
+          {
+            text: 'Player',
+            align: 'start',
+            sortable: false,
+            value: 'player_name',
+          },
+          { text: 'Guesses', value: 'guesses' },
+          { 
+            text: 'Word',
+            value: 'word',
+            sortable: false,
+          },
+          { text: 'Time', value: 'time' },
+        ],
+      }
+    },
   props: {
     title: String,
     wordles: Array,
@@ -50,7 +52,11 @@ export default {
     playerClick(player_id) {
       let url = `/players/${player_id}`
       this.$router.push(url)
-    }
+    },
+    getColor (fail) {
+        if (fail) return 'red'
+        else return 'green'
+      },
   },
 }
 

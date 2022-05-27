@@ -202,8 +202,8 @@ export default {
             this.inputs.guess = this.inputs.guess.slice(0, -1)
         },
         getActiveTiles() {
-            return this.guessGrid.querySelectorAll('[data-state="active"]')
             // return all the tiles that have the state of active
+            return this.guessGrid.querySelectorAll('[data-state="active"]')
         },
         submitGuess() {
             const activeTiles = [...this.getActiveTiles()] // get the array of active tiles

@@ -8,9 +8,7 @@ COPY package-lock.json /code
 RUN npm install --legacy-peer-deps
 
 RUN mkdir src
-COPY /src /code/src
-COPY vue.config.js /code
-COPY .eslintrc.js /code
+COPY . /code
 
 RUN npm run build
 

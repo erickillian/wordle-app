@@ -89,6 +89,8 @@ TEMPLATES = [
     },
 ]
 
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
 # AUTHENTICATION_BACKENDS = [
 #     # Needed to login by username in Django admin, regardless of `allauth`
 #     'django.contrib.auth.backends.ModelBackend',
@@ -103,7 +105,7 @@ LOGIN_REDIRECT_URL = '/'
 
 ALLOWED_HOSTS = [
     'localhost',
-    'localhost:8080',
+    'localhost:3000',
     # 'localhost:8080',
     # '127.0.0.1',
     # '127.0.0.1:8000',
