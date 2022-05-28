@@ -14,22 +14,10 @@ services:
             - POSTGRES_PASSWORD=password
         volumes:
             - ./data/db:/var/lib/postgresql/data
-    frontend:
-        build:
-            context: .
-            dockerfile: Dockerfile-frontend
-        networks:
-            djangonetwork:
-        volumes:
-            - type: bind
-              source: ./dist
-              target: /code/dist
-        ports:
-            - '3000:3000'
     web:
         build:
             context: .
-            dockerfile: Dockerfile-backend
+            dockerfile: Dockerfile
         ports:
             - '80:80'
         restart: 'always'
@@ -37,7 +25,6 @@ services:
             - .:/code
         depends_on:
             - db
-            - npm
         links:
             - db:db
         networks:
@@ -45,34 +32,3 @@ services:
 networks:
     djangonetwork:
         driver: bridge
-        # services:
-        #     db:
-        #         image: postgres
-        #         ports:
-        #             - '5432'
-        #         restart: always
-        #         environment:
-        #             - POSTGRES_DB=ranker
-        #             - POSTGRES_USER=ranker
-        #             - POSTGRES_PASSWORD=password
-        #         volumes:
-        #             - ./data/db:/var/lib/postgresql/data
-        #         networks:
-        #             djangonetwork:
-        #     web:
-        #         build: .
-        #         command: python3 manage.py runserver 0.0.0.0:8000
-        #         volumes:
-        #             - .:/code
-        #         ports:
-        #             - "8000:8000"
-        #         environment:
-        #             - POSTGRES_NAME=ranker
-        #             - POSTGRES_USER=ranker
-        #             - POSTGRES_PASSWORD=password
-        #         depends_on:
-        #             - db
-        #         networks:
-        #             djangonetwork:
-        #     networks:
-        #         djangonetwork:

@@ -115,6 +115,8 @@ ALLOWED_HOSTS = [
     # '0.0.0.0:8080',
 ]
 
+CSRF_TRUSTED_ORIGINS = ["http://localhost", "http://localhost:8080", "http://localhost:3000"]
+
 SITE_ID = 1
 
 ALLOWED_HOSTS = ['*']
