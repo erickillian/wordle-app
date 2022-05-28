@@ -115,7 +115,7 @@ ALLOWED_HOSTS = [
     # '0.0.0.0:8080',
 ]
 
-CSRF_TRUSTED_ORIGINS = ["http://localhost", "http://localhost:8080", "http://localhost:3000"]
+CSRF_TRUSTED_ORIGINS = ["http://localhost", "http://localhost:8080", "http://localhost:3000", "https://converge-general-sports.herokuapp.com"]
 
 SITE_ID = 1
 
