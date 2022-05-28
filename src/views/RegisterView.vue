@@ -151,7 +151,7 @@ export default {
     },
   },
   beforeRouteLeave(to, from, next) {
-    this.clearRegistrationStatus();
+    // this.clearRegistrationStatus();
     next();
   },
 };
