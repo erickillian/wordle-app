@@ -8,9 +8,9 @@ axios.defaults.withCredentials = true;
 // In production baseURL and crossdomain should be removed
 
 const session = axios.create({
-    baseURL: 'http://converge-general-sports.herokuapp:80',
+    // baseURL: 'http://converge-general-sports.herokuapp:80',
     header: "Access-Control-Allow-Origin",
-    crossdomain: true,
+    // crossdomain: true,
     xsrfCookieName: CSRF_COOKIE_NAME,
     xsrfHeaderName: CSRF_HEADER_NAME,
 });
