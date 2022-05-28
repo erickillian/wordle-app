@@ -9,11 +9,13 @@
           :items=wordles
           :items-per-page="5"
           class="elevation-1"
+          @click:row="playerClick"
         >
           <template v-slot:[`item.guesses`]="{ item }">
             <v-chip
               :color="getColor(item.fail)"
               dark
+              @click="playerClick(item.player)"
             >
               {{ item.guesses }}
             </v-chip>
@@ -49,9 +51,15 @@ export default {
     wordles: Array,
   },
   methods: {
-    playerClick(player_id) {
-      let url = `/players/${player_id}`
-      this.$router.push(url)
+    playerClick(row) {
+      this.wordles.map((wordle) => {
+        if (wordle == row) {
+          let url = `/players/${wordle.player}`
+          this.$router.push(url)
+        }
+      })
+
+      
     },
     getColor (fail) {
         if (fail) return 'red'
