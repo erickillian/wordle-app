@@ -122,7 +122,7 @@ export default {
             if (this.$store.state.wordle.guess_error == true) {
                 this.guessError()
                 this.$store.commit('wordle/WORDLE_GUESS_RESPONDED')
-            }  
+            }
         },
     },
 
@@ -154,17 +154,12 @@ export default {
         handleMouseClick(e) {
             if (e.target.matches("[data-key")) { // if event target is a key, press that key
                 this.pressKey(e.target.dataset.key);
-                return;
             }
-
-            if (e.target.matches("[data-enter]")) { // if user clicks enter, submit the guess
+            else if (e.target.matches("[data-enter]")) { // if user clicks enter, submit the guess
                 this.submitGuess();
-                return;
             }
-
-            if (e.target.matches("[data-delete]")) { // if user clicks delete, remove that key
+            else if (e.target.matches("[data-delete]") || e.target.parentElement.matches("[data-delete]") || e.target.parentElement.parentElement.matches("[data-delete]")) { // if user clicks delete, remove that key
                 this.deleteKey();
-                return;
             }
         },
         handleKeyPress(e) {
@@ -172,14 +167,11 @@ export default {
                 this.submitGuess()
                 return
             }
-
-            if (e.key === "Backspace" || e.key === "Delete") { // if user presses backspace or delete, delete key
+            else if (e.key === "Backspace" || e.key === "Delete") { // if user presses backspace or delete, delete key
                 this.deleteKey()
             }
-
-            if (e.key.match(/^[a-z]$/)) { // regex for one single letter between a and z
+            else if (e.key.match(/^[a-z]$/)) { // regex for one single letter between a and z
                 this.pressKey(e.key)
-                return
             }
         },
         pressKey(key) { // add key to first tile in grid
