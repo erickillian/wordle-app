@@ -203,7 +203,6 @@ class WordleGuess(APIView):
             if guess_serializer.is_valid():
                 active_wordle.guess_history += request.data['guess']
                 active_wordle.save()
-                print(active_wordle, flush=True)
                 serializer = ActiveWordleSerializer(active_wordle)
                 
                 if active_wordle.guesses == WORDLE_NUM_GUESSES or active_wordle.solved:
