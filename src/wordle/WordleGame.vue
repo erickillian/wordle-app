@@ -210,6 +210,7 @@ export default {
 
             this.guess({ guess: guess });
             this.stopInteraction()
+            this.checkWinLose()
             // activeTiles.forEach((...params) => this.flipTile(...params, guess)) // flip tile animation
         },
         initialGuesses() {
@@ -248,10 +249,7 @@ export default {
                         )
                     }, (i * DANCE_ANIMATION_DURATION*.75) / 7)
                 }
-                if (this.$store.state.wordle.info.solved == true) {
-                    console.log("solved")
-                    this.stopInteraction()
-                }
+                this.checkWinLose()                
             }
         },
         guessOk() {
@@ -325,18 +323,8 @@ export default {
             })
         },
         checkWinLose(guess, tiles) {
-            if (true) {
-                this.showAlert("Wow! You've won! I didn't think you could do it!", 5000)
-                this.danceTiles(tiles)
-                this.stopInteraction()
-                return
-            }
-
-            const remainingTiles = this.guessGrid.querySelectorAll(":not([data-letter])") // get all empty tiles
-
-            if (remainingTiles.length === 0) { // if no more remaining tiles
-                this.showAlert("🚨LOSER DETECTED!🚨")
-                this.showAlert(`The word was: }`, null)
+            if (this.$store.state.wordle.info.solved == true) {
+                console.log("solved")
                 this.stopInteraction()
             }
         },
