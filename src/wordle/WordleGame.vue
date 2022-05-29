@@ -216,18 +216,25 @@ export default {
             if (this.$store.state.wordle.status_loading == false) {
                 const guess_history = this.$store.state.wordle.info.guess_history;
                 const correct = this.$store.state.wordle.info.correct;
+                
                 for (var i=0; i < guess_history.length; i++) {
                     const nextTile = this.guessGrid.querySelector(":not([data-letter])");
-                    nextTile.textContent = guess_history[i].toLowerCase()
-                    nextTile.dataset.letter = guess_history[i].toLowerCase()
+                    const letter = guess_history[i].toLowerCase()
+                    nextTile.textContent = letter
+                    nextTile.dataset.letter = letter
+                    const key = this.keyboard.querySelector(`[data-key="${letter}"i]`) 
+
                     if (correct[i] == "0") {
                         nextTile.dataset.state = "wrong"
+                        key.classList.add("wrong")
                     }
                     if (correct[i] == "1") {
                         nextTile.dataset.state = "wrong-location"
+                        key.classList.add("wrong-location")
                     }
                     if (correct[i] == "2") {
                         nextTile.dataset.state = "correct"
+                        key.classList.add("correct")
                     }
                     
                     setTimeout(() => {
