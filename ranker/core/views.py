@@ -2,6 +2,7 @@ from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from django.utils import timezone
+from django.forms.models import model_to_dict
 
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -172,55 +173,57 @@ class WordleGuess(APIView):
     serializer_class = WordleGuessSerializer
 
     def post(self, request):
-        serializer = WordleGuessSerializer(data=request.data)
-        if serializer.is_valid():
-            try:
-                active_wordle = ActiveWordle.objects.get(player=request.user)
-                if active_wordle.date != timezone.now().date():
-                    active_wordle.delete()
-                    return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
-                elif active_wordle.solved == True:
-                    return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
-                else:
-                    if active_wordle.guesses < WORDLE_NUM_GUESSES:
-                        active_wordle.guess_history += request.data['guess']
-                        if active_wordle.guesses <= WORDLE_NUM_GUESSES:
-                            active_wordle.save()
-                        if active_wordle.solved:
-                            DailyWordle.objects.create(
-                                player=request.user, 
-                                word=active_wordle.word,
-                                guesses=active_wordle.guesses,
-                                date=active_wordle.date,
-                                time=timezone.now()-active_wordle.start_time,
-                                fail=False
-                            )
-                        elif active_wordle.guesses == WORDLE_NUM_GUESSES:
-                            DailyWordle.objects.create(
-                                player=request.user, 
-                                word=active_wordle.word,
-                                guesses=active_wordle.guesses,
-                                date=active_wordle.date,
-                                time=timezone.now()-active_wordle.start_time,
-                                fail=True
-                            )
-                serializer = ActiveWordleSerializer(active_wordle)
-                return Response(serializer.data)
+        active_wordles = ActiveWordle.objects.filter(player=request.user, start_time__date=timezone.now().date())
+        daily_wordles = DailyWordle.objects.filter(player=request.user, date=timezone.now().date())
 
-            except ActiveWordle.DoesNotExist:
+        if len(active_wordles) == 0 and len(daily_wordles) == 0:
+            guess_serializer = WordleGuessSerializer(data=request.data)
+            if guess_serializer.is_valid():
                 word = random.choice(wordle_target_words)
-                active_wordle = ActiveWordle.objects.create(player=request.user, guess_history=request.data['guess'], word=word)
+                active_wordle = ActiveWordle.objects.create(
+                    player=request.user, 
+                    guess_history=request.data['guess'], 
+                    word=word
+                )
+                active_wordle.save()
                 serializer = ActiveWordleSerializer(active_wordle)
-                return Response(serializer.data)
-            except:
-                print("bass request2", flush=True)
+                return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+            else:
+                serializer = ActiveWordleSerializer(active_wordle)
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-            
 
-            
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # If an active wordle for the user exists and they have no wordles
+        # on record for that day validate their guess 
+        elif len(active_wordles) == 1 and len(daily_wordles) == 0:
+            active_wordle = active_wordles[0]
+            if active_wordle.guesses >= WORDLE_NUM_GUESSES:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
 
+            guess_serializer = WordleGuessSerializer(data=request.data)
+            if guess_serializer.is_valid():
+                active_wordle.guess_history += request.data['guess']
+                active_wordle.save()
+                print(active_wordle, flush=True)
+                serializer = ActiveWordleSerializer(active_wordle)
+                
+                if active_wordle.guesses == WORDLE_NUM_GUESSES or active_wordle.solved:
+                    DailyWordle.objects.create(
+                        player=request.user, 
+                        word=active_wordle.word,
+                        guesses=active_wordle.guesses,
+                        date=active_wordle.date,
+                        time=timezone.now()-active_wordle.start_time,
+                        fail=not active_wordle.solved
+                    )
+                return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+            
+            else:
+                return Response({"Invalid Guess"}, status=status.HTTP_400_BAD_REQUEST)
+        elif len(active_wordles) >= 1 and len(daily_wordles) >= 1:
+            active_wordles[0].delete()
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
 class WordleDetail(APIView):
     authentication_classes = [SessionAuthentication]

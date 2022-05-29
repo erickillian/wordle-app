@@ -1,5 +1,6 @@
 
 from rest_framework import serializers
+from ranker.core.constants.wordle import WORDLE_NUM_GUESSES
 
 from ranker.core.models import Player, Event, Match, RatingHistory, CustomAccountManager, DailyWordle
 from allauth.account import app_settings as allauth_settings
@@ -104,6 +105,8 @@ class MatchHistorySerializer(serializers.Serializer):
     result = serializers.IntegerField()
     datetime = serializers.DateTimeField()
 
+
+
 class ActiveWordleSerializer(serializers.Serializer):
     guesses = serializers.IntegerField()
     guess_history = serializers.CharField(max_length=30)
@@ -119,10 +122,12 @@ def valid_guess(guess):
     if guess not in wordle_dictionary:
         raise serializers.ValidationError('Guess not a valid word')
 
+def valid_num_guesses(guesses):
+    if guesses > WORDLE_NUM_GUESSES:
+        raise serializers.ValidationError('You have exceeded the number of allowed guesses')
 
 class WordleGuessSerializer(serializers.Serializer):
     guess = serializers.CharField(max_length=5, validators=[valid_guess])
-
 
 class DailyWordleSerializer(serializers.ModelSerializer):
     player_name = serializers.CharField(source='player.full_name', read_only=True)
