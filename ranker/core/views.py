@@ -179,6 +179,11 @@ class WordleGuess(APIView):
         if len(active_wordles) == 0 and len(daily_wordles) == 0:
             guess_serializer = WordleGuessSerializer(data=request.data)
             if guess_serializer.is_valid():
+                # Deletes the old active wordle for the player if one exists
+                active_wordles = ActiveWordle.objects.filter(player=request.user)
+                if len(active_wordles) == 1:
+                    ActiveWordle.objects.delete(player=request.user)
+
                 word = random.choice(wordle_target_words)
                 active_wordle = ActiveWordle.objects.create(
                     player=request.user, 
