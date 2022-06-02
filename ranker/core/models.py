@@ -108,25 +108,17 @@ class ActiveWordle(models.Model):
         for i in range(0, int(len(self.guess_history) / WORDLE_MAX_LENGTH)):
             guess = self.guess_history[i*WORDLE_MAX_LENGTH:(i+1)*WORDLE_MAX_LENGTH]
             j = 0
-            for j in range(0, WORDLE_MAX_LENGTH):
-                if self.word[j] == guess[j]:
+            word_copy = self.word
+            for j, l in enumerate(guess):
+                if l == self.word[j]:
                     correct += "2"
-                elif guess[j] in self.word:
-                    word_count = self.word.count(guess[j])
-                    guess_count = guess.count(guess[j])
-                    if guess_count <= word_count:
-                        correct += "1"
-                    else:
-                        right_wrong_location = 0
-                        for k in range(j+1, WORDLE_MAX_LENGTH):
-                            if self.word[k] != guess[j] and guess[j] in self.word:
-                                right_wrong_location+=1
-                        if guess_count-word_count-right_wrong_location < 1:
-                            correct += "1"
-                        else:
-                            correct += "0"
+                    word_copy = word_copy[1:]
+                elif l in word_copy:
+                    correct += "1"
+                    word_copy = word_copy[1:]
                 else:
                     correct += "0"
+                    word_copy = word_copy[1:]
                 j += 1
         return correct
 
