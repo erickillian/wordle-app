@@ -118,7 +118,6 @@ class ActiveWordle(models.Model):
                     word_copy = word_copy[1:]
                 else:
                     correct += "0"
-                    word_copy = word_copy[1:]
                 j += 1
         return correct
 
