@@ -18,7 +18,6 @@ from ranker.core.constants.wordle import WORDLE_MAX_LENGTH, WORDLE_NUM_GUESSES
 from ranker.settings.dev import BASE_DIR
 
 
-
 class CustomAccountManager(BaseUserManager):
 
     def create_superuser(self, email, username, firstname, lastname, password, **other_fields):
@@ -110,11 +109,9 @@ class ActiveWordle(models.Model):
             word_copy = list(self.word)
             for j, letter in enumerate(guess):
                 if letter == self.word[j]:
-                    print(f"character {letter} == {self.word[j]}")
                     correct += "2"
-                    word_copy.pop(j)
+                    word_copy.pop(word_copy.index(letter))
                 elif letter in word_copy:
-                    print(f"character {letter} is in {word_copy}")
                     correct += "1"
                     word_copy.pop(word_copy.index(letter))
                 else:
