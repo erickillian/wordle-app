@@ -107,15 +107,16 @@ class ActiveWordle(models.Model):
         correct = ""
         for i in range(0, int(len(self.guess_history) / WORDLE_MAX_LENGTH)):
             guess = self.guess_history[i*WORDLE_MAX_LENGTH:(i+1)*WORDLE_MAX_LENGTH]
-            j = 0
-            word_copy = self.word
-            for j, l in enumerate(guess):
-                if l == self.word[j]:
+            word_copy = list(self.word)
+            for j, letter in enumerate(guess):
+                if letter == self.word[j]:
+                    print(f"character {letter} == {self.word[j]}")
                     correct += "2"
-                    word_copy = word_copy[1:]
-                elif l in word_copy:
+                    word_copy.pop(j)
+                elif letter in word_copy:
+                    print(f"character {letter} is in {word_copy}")
                     correct += "1"
-                    word_copy = word_copy[1:]
+                    word_copy.pop(word_copy.index(letter))
                 else:
                     correct += "0"
                 j += 1
