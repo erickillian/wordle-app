@@ -109,8 +109,7 @@ export default {
   ]),
   methods: {
     createAccount({ username, firstname, lastname, email, password1, password2 }) {
-      this.$store.dispatch('auth/createAccount', { username, firstname, lastname, email, password1, password2 })
-        .then(() => this.$router.push('/'));
+      this.$store.dispatch('auth/createAccount', { username, firstname, lastname, email, password1, password2 });
     },
   },
   beforeRouteLeave(to, from, next) {
