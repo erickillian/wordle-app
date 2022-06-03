@@ -5,21 +5,32 @@
         {{ title }}
         </v-subheader>
         <v-data-table
-          :headers="headers"
-          :items=wordles
-          :items-per-page="5"
-          class="elevation-1"
-          @click:row="playerClick"
+            :headers="headers"
+            :items=wordles
+            :items-per-page="-1"
+            class="elevation-1"
+            hide-default-footer
+            @click:row="playerClick"
         >
-          <template v-slot:[`item.guesses`]="{ item }">
-            <v-chip
-              :color="getColor(item.fail)"
-              dark
-              @click="playerClick(item.player)"
-            >
-              {{ item.guesses }}
-            </v-chip>
-          </template>
+            <template v-slot:[`item.player_name`]="{ index, item }">
+                <v-list-item-title>
+                    <v-icon
+                        dense
+                        v-if="index + 1 <= 3"
+                        :class="$store.state.placeClasses[index + 1]"
+                    >
+                        mdi-star-circle
+                    </v-icon>
+                    {{ item.player_name }}
+                </v-list-item-title>
+            </template>
+            <template v-slot:[`item.guesses`]="{ item }">
+                <v-chip
+                :color="getColor(item.fail)"
+                >
+                {{ item.guesses }}
+                </v-chip>
+            </template>
         </v-data-table>
     </v-card>
 </template>
@@ -36,13 +47,13 @@ export default {
             sortable: false,
             value: 'player_name',
           },
-          { text: 'Guesses', value: 'guesses' },
+          { text: 'Guesses', sortable: false, value: 'guesses' },
           { 
             text: 'Word',
             value: 'word',
             sortable: false,
           },
-          { text: 'Time', value: 'time' },
+          { text: 'Time', sortable: false, value: 'time' },
         ],
       }
     },

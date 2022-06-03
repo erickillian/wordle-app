@@ -11,7 +11,7 @@
           class="elevation-1"
           @click:row="playerClick"
           hide-default-footer
-        :items-per-page="all"
+        :items-per-page="-1"
         >
           <template v-slot:[`item.guesses`]="{ item }">
             <v-chip
