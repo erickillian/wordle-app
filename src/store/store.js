@@ -34,7 +34,7 @@ export default new Vuex.Store({
             totals: [],
             wordle: {
                 today: [],
-            }
+            },
         },
         player: {
             list: {

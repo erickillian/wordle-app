@@ -131,6 +131,7 @@ class WordleGuessSerializer(serializers.Serializer):
 
 class DailyWordleSerializer(serializers.ModelSerializer):
     player_name = serializers.CharField(source='player.full_name', read_only=True)
+    time = serializers.DurationField()
     class Meta:
         model = DailyWordle
         fields = '__all__'

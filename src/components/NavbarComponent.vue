@@ -1,4 +1,17 @@
 <template>
+    <!--v-app-bar dense app extended extension-height="0" :elevation="2" :clipped-left="true">
+        <v-app-bar-title>
+            <route-link to="/" tag style="cursor:pointer">ProjectName</route-link>
+        </v-app-bar-title>
+        <v-spacer></v-spacer>
+        <v-toolbar-items class="hidden-sm-and-down">
+            <v-btn text v-for="item in menu" :key="item.icon" :to="item.to" :href="item.href" :target="item.target">
+                <v-icon :left="true">{{ item.icon }}</v-icon>
+                {{ item.name }}
+            </v-btn>
+            
+        </v-toolbar-items>
+    </v-app-bar-->
     <v-app-bar dense app extended extension-height="0" :elevation="2" :clipped-left="true">
         <img style="max-width: 40px; max-height: 40px" class="mr-3" src="/static/logo.png" />
         <v-toolbar-title>Converge General Games Ranker</v-toolbar-title>
@@ -10,9 +23,6 @@
                 <v-icon :left="true">{{ item.icon }}</v-icon>
                 {{ item.name }}
             </v-btn>
-            <!-- <v-icon class="mr-1">mdi-moon-waxing-crescent
-      </v-icon>
-      <v-switch inset v-model="$vuetify.theme.dark" /> -->
         </v-toolbar-items>
         <div class="hidden-md-and-up">
             <v-menu>
@@ -29,10 +39,6 @@
                                 {{ item.name }}
                             </v-btn>
                         </v-list-item>
-                        <!-- <v-list-item>
-            <v-icon class="mr-1">mdi-moon-waxing-crescent</v-icon>
-            <v-switch inset v-model="$vuetify.theme.dark" />
-          </v-list-item> -->
                     </v-item-group>
                 </v-list>
 

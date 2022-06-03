@@ -1,5 +1,13 @@
 <template>
     <div>
+        <v-overlay :value=false>
+            You won!
+            <v-btn
+                color="success"
+            >
+            Close
+            </v-btn>
+        </v-overlay>
         <h1 class="header">Convergle</h1>
         <div class="alert-container" data-alert-container></div>
         <div data-guess-grid class="guess-grid">

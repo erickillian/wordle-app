@@ -13,14 +13,14 @@
             </v-col>
         </v-row>
 
-        <v-row class="mb-3">
+        <!--v-row class="mb-3">
             <v-col class="pt-0">
                 <LeadersCard
                 :title="$t('leaderboard.top')"
                 :leaders="$store.state.lb.leaders"
                 />
             </v-col>
-        </v-row>
+        </v-row-->
         <v-row class="mb-3">
             <v-col class="pt-0">
                 <TodayWordlesCard
@@ -32,29 +32,37 @@
         
     </v-col>
     <v-col>
-      <SimpleCard
+        <v-row class="mb-3">
+            <v-col class="pt-0">
+                <WordleWallOfShameCard
+                    title="Convergle Wall of Shame"
+                    :wordleFails="$store.state.leaderboards.wordle.shame"
+                />
+            </v-col>
+        </v-row>
+      <!--SimpleCard
         icon="mdi-thumb-up"
         :title="$t('leaderboard.most_games')"
         :content="$store.state.lb.maxes.games"
         valueClass="green--text text--accent-4"
         cardClass="mb-3"
-      />
+      /-->
 
-      <SimpleCard
+      <!--SimpleCard
         icon="mdi-thumb-up"
         :title="$t('leaderboard.winrate')"
         :content="$store.state.lb.maxes.winrate"
         valueFilter="percent"
         valueClass="green--text text--accent-4"
         cardClass="mb-3"
-      />
+      /-->
 
-      <SimpleCard
+      <!--SimpleCard
         icon="mdi-thumb-up"
         :title="$t('leaderboard.effective')"
         :content="$store.state.lb.maxes.efficiency"
         valueClass="green--text text--accent-4"
-      />
+      /-->
     </v-col>
     <!-- <v-col>
       <SimpleCard
@@ -78,17 +86,20 @@
 
 <script>
 import axios from "axios";
-import SimpleCard from "../components/leaderboard/SimpleCard";
+// import SimpleCard from "../components/leaderboard/SimpleCard";
 import LeadersCard from "../components/leaderboard/LeadersCard";
 import BigNumberCard from "../components/leaderboard/BigNumberCard";
 import TodayWordlesCard from "../components/leaderboard/TodayWordlesCard";
+import WordleWallOfShameCard from "../components/leaderboard/WordleWallOfShameCard";
 
 export default {
   name: "HomeView",
-  components: { SimpleCard, LeadersCard, BigNumberCard, TodayWordlesCard },
+  components: { WordleWallOfShameCard, LeadersCard, BigNumberCard, TodayWordlesCard },
   created() {
     this.$store.dispatch("fetchLeaderboard");
+    this.$store.dispatch("leaderboards/wordleFails");
     this.$store.dispatch("leaderboards/todaysWordles");
+    
   },
 };
 </script>
