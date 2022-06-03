@@ -1,11 +1,15 @@
 <template>
     <div>
-        <v-overlay :value=false>
+        <v-overlay 
+            :value="winOverlay" 
+            :z-index=1
+        >
             You won!
             <v-btn
                 color="success"
+                v-on:click="closeWinOverlay"
             >
-            Close
+                Close
             </v-btn>
         </v-overlay>
         <h1 class="header">Convergle</h1>
@@ -91,15 +95,14 @@ import { mapActions, mapState } from 'vuex';
 
 // CONSTANTS
 const WORD_LENGTH = 5;
-const FLIP_ANIMATION_DURATION = 750
-const DANCE_ANIMATION_DURATION = 500
+const FLIP_ANIMATION_DELAY = 350
+const DANCE_ANIMATION_DELAY = 50
+const ANIMATION_LENGTH = 1000
 
 export default {
     name: "WordleGame",
     // components: { SimpleCard, LeadersCard, BigNumberCard },
     mounted() {
-        document.addEventListener("click", this.handleMouseClick);
-        document.addEventListener("keydown", this.handleKeyPress);
         this.guessGrid = this.$el.querySelector("[data-guess-grid]");
         this.keyboard = this.$el.querySelector("[data-keyboard]");
         this.alertContainer = this.$el.querySelector("[data-alert-container]"); // get the empty div container for alerts
@@ -140,9 +143,9 @@ export default {
             inputs: {
                 guess: '',
             },
+            winOverlay: false,
         };
     },
-    // mounted: this.startInteraction(),
     methods: {
         ...mapActions('wordle', [
             'guess',
@@ -152,12 +155,17 @@ export default {
             wordle: state=> state.wordle
         }),
         startInteraction() { // start listening for clicks and keypresses
+            console.log("Starting Interaction");
             document.addEventListener("click", this.handleMouseClick);
             document.addEventListener("keydown", this.handleKeyPress);
         },
         stopInteraction() { // remove the event listeners for clicks and keypresses, effectively making the user unable to interact or type anything
+            console.log("Stopping Interaction");
             document.removeEventListener("click", this.handleMouseClick);
             document.removeEventListener("keydown", this.handleKeyPress);
+        },
+        closeWinOverlay() {
+            this.winOverlay = false;
         },
         handleMouseClick(e) {
             if (e.target.matches("[data-key")) { // if event target is a key, press that key
@@ -206,6 +214,7 @@ export default {
             return this.guessGrid.querySelectorAll('[data-state="active"]')
         },
         submitGuess() {
+            this.stopInteraction()
             const activeTiles = [...this.getActiveTiles()] // get the array of active tiles
             if (activeTiles.length !== WORD_LENGTH) { // if the guess isn't long enough, can't submit it!
                 this.showAlert("Not enough letters!")
@@ -217,8 +226,6 @@ export default {
             }, "") // returns a string
 
             this.guess({ guess: guess });
-            this.stopInteraction()
-            this.checkWinLose()
             // activeTiles.forEach((...params) => this.flipTile(...params, guess)) // flip tile animation
         },
         initialGuesses() {
@@ -255,39 +262,45 @@ export default {
                             },
                             { once: true }
                         )
-                    }, (i * DANCE_ANIMATION_DURATION*.75) / 7)
+                    }, (i * DANCE_ANIMATION_DELAY));
                 }
-                this.checkWinLose()                
+                setTimeout(() => {
+                    this.checkWinLose()
+                }, (guess_history.length+1 * DANCE_ANIMATION_DELAY)+ANIMATION_LENGTH);
+            }
+        },
+        checkWinLose() {
+            if (this.$store.state.wordle.info.solved == true) {
+                console.log("solved")
+                this.word = this.$store.state.wordle.info.guess_history.slice(-WORD_LENGTH);
+
+                this.winOverlay = true;
+                this.stopInteraction()
+            } else {
+                this.startInteraction()
             }
         },
         guessOk() {
             const guess = this.$store.state.wordle.info.guess_history.slice(-WORD_LENGTH);
             const correct = this.$store.state.wordle.info.correct.slice(-WORD_LENGTH);
-            this.startInteraction()
-
             const activeTiles = [...this.getActiveTiles()]
-            activeTiles.forEach((...params) => this.flipTile(...params, guess, correct)) // flip tile animation
-            if (this.$store.state.wordle.info.solved == true) {
-                console.log("solved")
-                this.stopInteraction()
-            } else {
-                this.startInteraction()
-            }
-
+            activeTiles.forEach((...params) => this.flipTile(...params, guess, correct, FLIP_ANIMATION_DELAY)) // flip tile animation
+            setTimeout(() => {
+                this.checkWinLose()
+            }, (WORD_LENGTH * DANCE_ANIMATION_DELAY)+ANIMATION_LENGTH);
         },
         guessError() {
-            this.startInteraction()
             const activeTiles = [...this.getActiveTiles()]
             this.shakeTiles(activeTiles)// flip tile animation
             this.showAlert("Guess Error")
-
+            this.checkWinLose()
         },
-        flipTile(tile, index, array, guess, correct) {
+        flipTile(tile, index, array, guess, correct, DELAY) {
             const letter = tile.dataset.letter           
             const key = this.keyboard.querySelector(`[data-key="${letter}"i]`) // get each key - the i makes it case insensitivehel
             setTimeout(() => {
                 tile.classList.add("flip")
-            }, index * FLIP_ANIMATION_DURATION / 2)
+            }, index * DELAY)
 
             tile.addEventListener("transitionend", () => {
                 tile.classList.remove("flip") // remvoe flip class for animation
@@ -301,26 +314,20 @@ export default {
                     tile.dataset.state = "wrong"
                     key.classList.add("wrong")
                 }
-
-                if (index === array.length - 1) { // if last tile, user can start interacting again
-                    tile.addEventListener("transitionend", () => {
-                        this.startInteraction()
-                    }, { once: true })
-                }
-            }, { once: true })
+            })
         },
-        showAlert(message, duration = 1000) {
+        showAlert(message, DELAY = 1000) {
             const alert = document.createElement("div") // get the empty alert div
             alert.textContent = message // add message
             alert.classList.add("alert") // add alert class
             this.alertContainer.prepend(alert)
-            if (duration == null) return
+            if (DELAY == null) return
             setTimeout(() => {
                 alert.classList.add("hide")
                 alert.addEventListener("transitionend", () => {
                     alert.remove()
                 })
-            }, duration)
+            }, DELAY)
         },
         shakeTiles(tiles) {
             tiles.forEach(tile => {
@@ -329,12 +336,6 @@ export default {
                     tile.classList.remove("shake")
                 }, { once: true })
             })
-        },
-        checkWinLose(guess, tiles) {
-            if (this.$store.state.wordle.info.solved == true) {
-                console.log("solved")
-                this.stopInteraction()
-            }
         },
         danceTiles(tiles) {
             tiles.forEach((tile, index) => {
@@ -347,7 +348,7 @@ export default {
                         },
                         { once: true }
                     )
-                }, (index * DANCE_ANIMATION_DURATION) / 5)
+                }, (index * DANCE_ANIMATION_DELAY) / 5)
             })
         },
     },

@@ -235,7 +235,7 @@ class WordleGuess(APIView):
                 return Response({"Invalid Guess"}, status=status.HTTP_400_BAD_REQUEST)
         elif len(active_wordles) == 1 and len(daily_wordles) == 1:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        elif len(active_wordle) > 1:
+        elif len(active_wordles) > 1:
             active_wordles[0].delete()
             return Response(status=status.HTTP_400_BAD_REQUEST)
         else:
