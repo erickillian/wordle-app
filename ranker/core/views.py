@@ -270,7 +270,7 @@ class WordlesToday(APIView):
     serializer_class = DailyWordleSerializer
 
     def get(self, request):
-        queryset = DailyWordle.objects.filter(date=timezone.now().date()).order_by('guesses', 'time')
+        queryset = DailyWordle.objects.filter(date=timezone.now().date()).order_by('fail', 'guesses', 'time')
         serializer = DailyWordleSerializer(queryset, many=True)
         return Response(serializer.data)
 
