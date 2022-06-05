@@ -110,7 +110,8 @@ class ActiveWordle(models.Model):
             for j, letter in enumerate(guess):
                 if letter == self.word[j]:
                     correct += "2"
-                    word_copy.pop(word_copy.index(letter))
+                    if letter in word_copy:
+                        word_copy.pop(word_copy.index(letter))
                 elif letter in word_copy:
                     correct += "1"
                     word_copy.pop(word_copy.index(letter))
