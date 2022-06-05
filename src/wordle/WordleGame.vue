@@ -95,9 +95,9 @@ import { mapActions, mapState } from 'vuex';
 
 // CONSTANTS
 const WORD_LENGTH = 5;
-const FLIP_ANIMATION_DELAY = 350
+const FLIP_ANIMATION_DELAY = 300
 const DANCE_ANIMATION_DELAY = 50
-const ANIMATION_LENGTH = 1000
+const ANIMATION_LENGTH = 500
 
 export default {
     name: "WordleGame",
@@ -121,6 +121,7 @@ export default {
     },
     watch: {
         initial_load() {
+            this.checkInteraction()
             this.initialGuesses()
         },
         guess_ok() {
@@ -198,6 +199,15 @@ export default {
             nextTile.dataset.letter = key.toLowerCase() // add the letter to the tile's dataset
             nextTile.textContent = key // make the html the key
             nextTile.dataset.state = "active" // set it to active
+            nextTile.classList.add("pop")
+            nextTile.addEventListener(
+                "animationend",
+                () => {
+                    nextTile.classList.remove("pop")
+                },
+                { once: true }
+            )
+            
             this.inputs.guess += key.toLowerCase()
         },
         deleteKey() {
@@ -219,6 +229,7 @@ export default {
             if (activeTiles.length !== WORD_LENGTH) { // if the guess isn't long enough, can't submit it!
                 this.showAlert("Not enough letters!")
                 this.shakeTiles(activeTiles)
+                this.startInteraction()
                 return
             }
             const guess = activeTiles.reduce((word, tile) => { // sum the array of individual letters into a string
@@ -239,20 +250,20 @@ export default {
                     nextTile.textContent = letter
                     nextTile.dataset.letter = letter
                     const key = this.keyboard.querySelector(`[data-key="${letter}"i]`) 
-
-                    if (correct[i] == "0") {
-                        nextTile.dataset.state = "wrong"
-                        key.classList.add("wrong")
+                    if (key) {
+                        if (correct[i] == "0") {
+                            nextTile.dataset.state = "wrong"
+                            key.classList.add("wrong")
+                        }
+                        if (correct[i] == "1") {
+                            nextTile.dataset.state = "wrong-location"
+                            key.classList.add("wrong-location")
+                        }
+                        if (correct[i] == "2") {
+                            nextTile.dataset.state = "correct"
+                            key.classList.add("correct")
+                        }
                     }
-                    if (correct[i] == "1") {
-                        nextTile.dataset.state = "wrong-location"
-                        key.classList.add("wrong-location")
-                    }
-                    if (correct[i] == "2") {
-                        nextTile.dataset.state = "correct"
-                        key.classList.add("correct")
-                    }
-                    
                     setTimeout(() => {
                         nextTile.classList.add("bounce")
                         nextTile.addEventListener(
@@ -265,17 +276,22 @@ export default {
                     }, (i * DANCE_ANIMATION_DELAY));
                 }
                 setTimeout(() => {
-                    this.checkWinLose()
+                    // this.checkWinLose()
                 }, (guess_history.length+1 * DANCE_ANIMATION_DELAY)+ANIMATION_LENGTH);
             }
         },
+        checkInteraction() {
+            if (this.$store.state.wordle.info.solved == false) {
+                this.startInteraction();
+            }
+        },
+
         checkWinLose() {
             if (this.$store.state.wordle.info.solved == true) {
                 console.log("solved")
+                this.twirlWinningTiles()
                 this.word = this.$store.state.wordle.info.guess_history.slice(-WORD_LENGTH);
-
                 this.winOverlay = true;
-                this.stopInteraction()
             } else {
                 this.startInteraction()
             }
@@ -351,6 +367,36 @@ export default {
                 }, (index * DANCE_ANIMATION_DELAY) / 5)
             })
         },
+        bounceTiles(tiles) {
+            const guess_history = this.$store.state.wordle.info.guess_history;
+            tiles.forEach((tile, index) => {
+                setTimeout(() => {
+                    tile.classList.add("bounce")
+                    tile.addEventListener(
+                        "animationend",
+                        () => {
+                            tile.classList.remove("bounce")
+                        },
+                        { once: true }
+                    )
+                }, (index * DANCE_ANIMATION_DELAY) / 5)
+            })
+        },
+        twirlWinningTiles() {
+            tiles = this.guessGrid.querySelectorAll('[data-letter]')
+            tiles.forEach((tile, index) => {
+                setTimeout(() => {
+                    tile.classList.add("twirl")
+                    tile.addEventListener(
+                        "animationend",
+                        () => {
+                            tile.classList.remove("twirl")
+                        },
+                        { once: true }
+                    )
+                }, (index * DANCE_ANIMATION_DELAY) / 5)
+            })
+        }
     },
 };
 </script>

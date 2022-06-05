@@ -134,6 +134,18 @@ body {
     animation: bounce 500ms;
 }
 
+.tile.twirl {
+    animation: twirl 2000ms;
+}
+
+.tile.pop {
+    animation: pop 100ms;
+}
+
+.tile.shrink {
+    animation: shrink 100ms;
+}
+
 .tile.flip {
     transform: rotateX(90deg);
 }
@@ -163,6 +175,31 @@ body {
         transform: translateX(0);
     }
 }
+
+@keyframes twirl {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes pop {
+    0% {
+        transform: scale(1);
+    }
+
+    40% {
+        transform: scale(1.15);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
 
 @keyframes dance {
     20% {
