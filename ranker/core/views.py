@@ -190,9 +190,7 @@ class WordleGuess(APIView):
             guess_serializer = WordleGuessSerializer(data=request.data)
             if guess_serializer.is_valid():
                 # Deletes the old active wordle for the player if one exists
-                active_wordles = ActiveWordle.objects.filter(player=request.user)
-                if len(active_wordles) == 1:
-                    ActiveWordle.objects.delete(player=request.user)
+                active_wordles = ActiveWordle.objects.filter(player=request.user).delete()
 
                 word = random.choice(wordle_target_words)
                 active_wordle = ActiveWordle.objects.create(
@@ -200,12 +198,10 @@ class WordleGuess(APIView):
                     guess_history=request.data['guess'], 
                     word=word
                 )
-                active_wordle.save()
                 serializer = ActiveWordleSerializer(active_wordle)
                 return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
             else:
-                serializer = ActiveWordleSerializer(active_wordle)
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                return Response(status=status.HTTP_400_BAD_REQUEST)
 
         # If an active wordle for the user exists and they have no wordles
         # on record for that day validate their guess 
@@ -232,7 +228,7 @@ class WordleGuess(APIView):
                 return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
             
             else:
-                return Response({"Invalid Guess"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response(status=status.HTTP_400_BAD_REQUEST)
         elif len(active_wordles) == 1 and len(daily_wordles) == 1:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         elif len(active_wordles) > 1:
