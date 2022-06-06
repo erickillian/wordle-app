@@ -131,11 +131,11 @@ body {
 }
 
 .tile.bounce {
-    animation: bounce 500ms;
+    animation: bounce 400ms;
 }
 
 .tile.twirl {
-    animation: twirl 2000ms;
+    animation: twirl 1500ms;
 }
 
 .tile.pop {

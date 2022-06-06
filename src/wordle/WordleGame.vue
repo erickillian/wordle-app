@@ -1,6 +1,6 @@
 <template>
     <div>
-        <v-overlay 
+        <!--v-overlay 
             :value="winOverlay" 
             :z-index=1
         >
@@ -11,7 +11,7 @@
             >
                 Close
             </v-btn>
-        </v-overlay>
+        </v-overlay-->
         <h1 class="header">Convergle</h1>
         <div class="alert-container" data-alert-container></div>
         <div data-guess-grid class="guess-grid">
@@ -96,6 +96,13 @@ import { mapActions, mapState } from 'vuex';
 // CONSTANTS
 const WORD_LENGTH = 5;
 const FLIP_ANIMATION_DELAY = 300
+
+const BOUNCE_ANIMATION_DELAY = 30
+const BOUNCE_ANIMATION_LENGTH = 400
+
+const TWIRL_ANIMATION_DELAY = 0
+const TWIRL_ANIMATION_LENGTH = 1500
+
 const DANCE_ANIMATION_DELAY = 50
 const ANIMATION_LENGTH = 500
 
@@ -211,17 +218,21 @@ export default {
             this.inputs.guess += key.toLowerCase()
         },
         deleteKey() {
-            const activeTiles = this.getActiveTiles() // get array of active tiles
-            const lastTile = activeTiles[activeTiles.length - 1] // get the last active tile
-            if (!lastTile) return // if that tile doesn't have any content, return
-            lastTile.textContent = "" // set the text content to an empty string
-            delete lastTile.dataset.state // delete active state
-            delete lastTile.dataset.letter // delete letter dataset
-            this.inputs.guess = this.inputs.guess.slice(0, -1)
+            const activeTiles = this.getActiveTiles(); // get array of active tiles
+            const lastTile = activeTiles[activeTiles.length - 1]; // get the last active tile
+            if (!lastTile) return; // if that tile doesn't have any content, return
+            lastTile.textContent = ""; // set the text content to an empty string
+            delete lastTile.dataset.state; // delete active state
+            delete lastTile.dataset.letter; // delete letter dataset
+            this.inputs.guess = this.inputs.guess.slice(0, -1);
         },
         getActiveTiles() {
             // return all the tiles that have the state of active
-            return this.guessGrid.querySelectorAll('[data-state="active"]')
+            return this.guessGrid.querySelectorAll('[data-state="active"]');
+        },
+        getFilledTiles() {
+            // return all the tiles that are filled with a letter
+            return this.guessGrid.querySelectorAll('[data-letter]');
         },
         submitGuess() {
             this.stopInteraction()
@@ -264,20 +275,11 @@ export default {
                             key.classList.add("correct")
                         }
                     }
-                    setTimeout(() => {
-                        nextTile.classList.add("bounce")
-                        nextTile.addEventListener(
-                            "animationend",
-                            () => {
-                                nextTile.classList.remove("bounce")
-                            },
-                            { once: true }
-                        )
-                    }, (i * DANCE_ANIMATION_DELAY));
                 }
+                var time = this.bounceTiles();
                 setTimeout(() => {
-                    // this.checkWinLose()
-                }, (guess_history.length+1 * DANCE_ANIMATION_DELAY)+ANIMATION_LENGTH);
+                    this.checkWinLose()
+                }, time);
             }
         },
         checkInteraction() {
@@ -364,12 +366,14 @@ export default {
                         },
                         { once: true }
                     )
-                }, (index * DANCE_ANIMATION_DELAY) / 5)
+                }, (index * DANCE_ANIMATION_DELAY))
             })
         },
-        bounceTiles(tiles) {
-            const guess_history = this.$store.state.wordle.info.guess_history;
-            tiles.forEach((tile, index) => {
+        bounceTiles() {
+            var time = 0;
+            const allTiles = this.getFilledTiles();
+            for (let i = 0; i < allTiles.length; i++) {
+                const tile = allTiles[i]
                 setTimeout(() => {
                     tile.classList.add("bounce")
                     tile.addEventListener(
@@ -379,12 +383,17 @@ export default {
                         },
                         { once: true }
                     )
-                }, (index * DANCE_ANIMATION_DELAY) / 5)
-            })
+                }, (i * BOUNCE_ANIMATION_DELAY))
+                time += BOUNCE_ANIMATION_DELAY;
+            }
+            time += BOUNCE_ANIMATION_LENGTH
+            return time
         },
         twirlWinningTiles() {
-            tiles = this.guessGrid.querySelectorAll('[data-letter]')
-            tiles.forEach((tile, index) => {
+            var time = 0;
+            const allTiles = this.getFilledTiles();
+            for (let i = allTiles.length-WORD_LENGTH; i < allTiles.length; i++) {
+                const tile = allTiles[i]
                 setTimeout(() => {
                     tile.classList.add("twirl")
                     tile.addEventListener(
@@ -394,8 +403,11 @@ export default {
                         },
                         { once: true }
                     )
-                }, (index * DANCE_ANIMATION_DELAY) / 5)
-            })
+                }, (i * TWIRL_ANIMATION_DELAY))
+                time += TWIRL_ANIMATION_DELAY;
+            }
+            time += TWIRL_ANIMATION_LENGTH;
+            return time;
         }
     },
 };
