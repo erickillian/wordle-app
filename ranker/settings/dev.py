@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(SETTINGS_DIR))
 SECRET_KEY = 'development_secret_key'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 # CORS_EXPOSE_HEADERS = ['Content-Type', 'X-CSRFToken']
 # CORS_ALLOW_CREDENTIALS = True
