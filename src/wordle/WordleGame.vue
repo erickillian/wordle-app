@@ -96,6 +96,7 @@ import { mapActions, mapState } from 'vuex';
 // CONSTANTS
 const WORD_LENGTH = 5;
 const FLIP_ANIMATION_DELAY = 300
+const FLIP_ANIMATION_LENGTH = 300
 
 const BOUNCE_ANIMATION_DELAY = 30
 const BOUNCE_ANIMATION_LENGTH = 400
@@ -301,38 +302,41 @@ export default {
         guessOk() {
             const guess = this.$store.state.wordle.info.guess_history.slice(-WORD_LENGTH);
             const correct = this.$store.state.wordle.info.correct.slice(-WORD_LENGTH);
-            const activeTiles = [...this.getActiveTiles()]
-            activeTiles.forEach((...params) => this.flipTile(...params, guess, correct, FLIP_ANIMATION_DELAY)) // flip tile animation
+            const activeTiles = this.getActiveTiles()
+
+
+            for (let i = 0; i < activeTiles.length; i++) {
+                let tile = activeTiles[i];
+                const letter = tile.dataset.letter           
+                const key = this.keyboard.querySelector(`[data-key="${letter}"i]`) // get each key - the i makes it case insensitivehel
+
+                setTimeout(() => {
+                    tile.classList.add("flip")
+                }, i * FLIP_ANIMATION_DELAY)
+
+                tile.addEventListener("transitionend", () => {
+                    tile.classList.remove("flip") // remvoe flip class for animation
+                    if (correct[i] === "2") {
+                        tile.dataset.state = "correct"
+                        key.classList.add("correct") // while flipping, if it's the right location and right letter, add correct class
+                    } else if (correct[i] === "1") { // otherwise if word includes letter, add wrong location class
+                        tile.dataset.state = "wrong-location"
+                        key.classList.add("wrong-location")
+                    } else if (correct[i] === "0") { // else add wrong class
+                        tile.dataset.state = "wrong"
+                        key.classList.add("wrong")
+                    }
+                })
+            }            
             setTimeout(() => {
                 this.checkWinLose()
-            }, (WORD_LENGTH * DANCE_ANIMATION_DELAY)+ANIMATION_LENGTH);
+            }, ((WORD_LENGTH) * FLIP_ANIMATION_DELAY)+FLIP_ANIMATION_LENGTH);
         },
         guessError() {
             const activeTiles = [...this.getActiveTiles()]
             this.shakeTiles(activeTiles)// flip tile animation
             this.showAlert("Guess Error")
             this.checkWinLose()
-        },
-        flipTile(tile, index, array, guess, correct, DELAY) {
-            const letter = tile.dataset.letter           
-            const key = this.keyboard.querySelector(`[data-key="${letter}"i]`) // get each key - the i makes it case insensitivehel
-            setTimeout(() => {
-                tile.classList.add("flip")
-            }, index * DELAY)
-
-            tile.addEventListener("transitionend", () => {
-                tile.classList.remove("flip") // remvoe flip class for animation
-                if (correct[index] === "2") {
-                    tile.dataset.state = "correct"
-                    key.classList.add("correct") // while flipping, if it's the right location and right letter, add correct class
-                } else if (correct[index] === "1") { // otherwise if word includes letter, add wrong location class
-                    tile.dataset.state = "wrong-location"
-                    key.classList.add("wrong-location")
-                } else if (correct[index] === "0") { // else add wrong class
-                    tile.dataset.state = "wrong"
-                    key.classList.add("wrong")
-                }
-            })
         },
         showAlert(message, DELAY = 1000) {
             const alert = document.createElement("div") // get the empty alert div
@@ -370,7 +374,6 @@ export default {
             })
         },
         bounceTiles() {
-            var time = 0;
             const allTiles = this.getFilledTiles();
             for (let i = 0; i < allTiles.length; i++) {
                 const tile = allTiles[i]
@@ -384,10 +387,9 @@ export default {
                         { once: true }
                     )
                 }, (i * BOUNCE_ANIMATION_DELAY))
-                time += BOUNCE_ANIMATION_DELAY;
+                
             }
-            time += BOUNCE_ANIMATION_LENGTH
-            return time
+            return (allTiles.length*BOUNCE_ANIMATION_DELAY+BOUNCE_ANIMATION_LENGTH)
         },
         twirlWinningTiles() {
             var time = 0;
@@ -406,8 +408,7 @@ export default {
                 }, (i * TWIRL_ANIMATION_DELAY))
                 time += TWIRL_ANIMATION_DELAY;
             }
-            time += TWIRL_ANIMATION_LENGTH;
-            return time;
+            return (WORD_LENGTH*BOUNCE_ANIMATION_DELAY+BOUNCE_ANIMATION_LENGTH)
         }
     },
 };
