@@ -130,7 +130,7 @@ class ActiveWordle(models.Model):
         verbose_name_plural = ('active_wordles')
             
 
-class DailyWordle(models.Model):
+class Wordle(models.Model):
     player = models.ForeignKey(Player, default=None,on_delete=models.CASCADE)
     word = models.CharField(max_length=5, blank=False)
     guesses = models.PositiveSmallIntegerField(blank=False)

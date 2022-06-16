@@ -23,20 +23,50 @@
         </v-row-->
         <v-row class="mb-3">
             <v-col class="pt-0">
-                <TodayWordlesCard
+                <WordleListCard
                     title="Todays Convergles"
+                    icon="mdi-trophy"
                     :wordles="$store.state.leaderboards.wordle.today"
+                    :headers="todays_wordle_headers"
+                    :items_per_page="10"
+                    :hide_footer="false"
                 />
             </v-col>
         </v-row>
         
     </v-col>
     <v-col>
+         <v-row class="mb-3">
+            <v-col class="pt-0">
+                <WordleListCard
+                    title="Top Average Guesses"
+                    icon="mdi-trophy"
+                    :wordles="$store.state.leaderboards.wordle.leaders.avg_guesses"
+                    :headers="avg_guesses_headers"
+                    :items_per_page="5"
+                    :hide_footer="true"
+                />
+            </v-col>
+            <v-col class="pt-0">
+                <WordleListCard
+                    title="Top Average Time"
+                    icon="mdi-trophy"
+                    :wordles="$store.state.leaderboards.wordle.leaders.avg_time"
+                    :headers="avg_time_headers"
+                    :items_per_page="5"
+                    :hide_footer="true"
+                />
+            </v-col>
+        </v-row>
         <v-row class="mb-3">
             <v-col class="pt-0">
-                <WordleWallOfShameCard
+                <WordleListCard
                     title="Convergle Wall of Shame"
-                    :wordleFails="$store.state.leaderboards.wordle.shame"
+                    icon="mdi-alert-outline"
+                    :wordles="$store.state.leaderboards.wordle.shame"
+                    :headers="wall_of_shame_headers"
+                    :items_per_page="-1"
+                    :hide_footer="true"
                 />
             </v-col>
         </v-row>
@@ -87,19 +117,82 @@
 <script>
 import axios from "axios";
 // import SimpleCard from "../components/leaderboard/SimpleCard";
-import LeadersCard from "../components/leaderboard/LeadersCard";
-import BigNumberCard from "../components/leaderboard/BigNumberCard";
-import TodayWordlesCard from "../components/leaderboard/TodayWordlesCard";
-import WordleWallOfShameCard from "../components/leaderboard/WordleWallOfShameCard";
+// import LeadersCard from "../components/leaderboard/LeadersCard";
+import BigNumberCard from "@/components/leaderboard/BigNumberCard";
+import WordleListCard from "@/components/leaderboard/WordleListCard";
 
 export default {
-  name: "HomeView",
-  components: { WordleWallOfShameCard, LeadersCard, BigNumberCard, TodayWordlesCard },
-  created() {
-    this.$store.dispatch("fetchLeaderboard");
-    this.$store.dispatch("leaderboards/wordleFails");
-    this.$store.dispatch("leaderboards/todaysWordles");
-    
-  },
+    name: "HomeView",
+    components: { BigNumberCard, WordleListCard },
+    created() {
+        this.$store.dispatch("fetchLeaderboard");
+        this.$store.dispatch("leaderboards/wordleFails");
+        this.$store.dispatch("leaderboards/todaysWordles");
+        this.$store.dispatch("leaderboards/wordleAvgGuesses");
+        this.$store.dispatch("leaderboards/wordleAvgTime");
+    },
+    data () {
+        return {
+            todays_wordle_headers: [
+                {
+                    text: 'Player',
+                    align: 'start',
+                    sortable: false,
+                    value: 'player_name',
+                },
+                { text: 'Guesses', sortable: false, value: 'guesses' },
+                { 
+                    text: 'Word',
+                    value: 'word',
+                    sortable: false,
+                },
+                { text: 'Time', sortable: false, value: 'time' },
+            ],
+            wall_of_shame_headers: [
+                {
+                    text: 'Player',
+                    align: 'start',
+                    sortable: false,
+                    value: 'player_name',
+                },
+                { 
+                    text: 'Word',
+                    value: 'word',
+                    sortable: false,
+                },
+                {
+                    text: 'Date',
+                    sortable: false,
+                    value: 'date',
+                },
+            ],
+            avg_guesses_headers: [
+                {
+                    text: 'Player',
+                    align: 'start',
+                    sortable: false,
+                    value: 'full_name',
+                },
+                {
+                    text: 'Average Guesses',
+                    sortable: false,
+                    value: 'avg_guesses',
+                },
+            ],
+            avg_time_headers: [
+                {
+                    text: 'Player',
+                    align: 'start',
+                    sortable: false,
+                    value: 'full_name',
+                },
+                {
+                    text: 'Average Time',
+                    sortable: false,
+                    value: 'avg_time',
+                },
+            ],
+        }
+    },
 };
 </script>

@@ -3,6 +3,11 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from django.utils import timezone
 from django.forms.models import model_to_dict
+from django.db.models import Avg
+from django.db.models.expressions import Window
+from django.db.models.functions import RowNumber
+from django.db.models import F
+
 
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -14,16 +19,18 @@ from rest_framework import status
 from rest_framework import viewsets
 
 from ranker.core.models import (
-    Player, Event, PlayerRating, DailyWordle, ActiveWordle,
+    Player, Event, PlayerRating, Wordle, ActiveWordle,
 )
 from ranker.core.serializers import (
     PlayerSerializer,
+    PlayerWordleGuessesSerializer,
+    PlayerWordleTimeSerializer,
     EventSerializer,
     RatingHistorySerializer,
     MatchHistorySerializer,
     ActiveWordleSerializer,
     WordleGuessSerializer,
-    DailyWordleSerializer
+    WordleSerializer
 )
 from ranker.core.services import data
 
@@ -140,8 +147,8 @@ class PlayerStats(APIView):
 class PlayerWordles(APIView):
     def get(self, request, player_id):
         try:
-            queryset = DailyWordle.objects.filter(player=player_id).order_by('date')
-            serializer = DailyWordleSerializer(queryset, many=True)
+            queryset = Wordle.objects.filter(player=player_id).order_by('date')
+            serializer = WordleSerializer(queryset, many=True)
             return Response(serializer.data)
         except PlayerRating.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
@@ -154,9 +161,9 @@ class WordleStatus(APIView):
 
     def get(self, request):
         try:
-            wordle = DailyWordle.objects.get(player=request.user, date=timezone.now().date())
+            wordle = Wordle.objects.get(player=request.user, date=timezone.now().date())
             active_wordle = ActiveWordle.objects.get(player=request.user)
-        except DailyWordle.DoesNotExist:
+        except Wordle.DoesNotExist:
             try:
                 active_wordle = ActiveWordle.objects.get(player=request.user)
                 if active_wordle.date != timezone.now().date():
@@ -184,7 +191,7 @@ class WordleGuess(APIView):
 
     def post(self, request):
         active_wordles = ActiveWordle.objects.filter(player=request.user, start_time__date=timezone.now().date())
-        daily_wordles = DailyWordle.objects.filter(player=request.user, date=timezone.now().date())
+        daily_wordles = Wordle.objects.filter(player=request.user, date=timezone.now().date())
 
         if len(active_wordles) == 0 and len(daily_wordles) == 0:
             guess_serializer = WordleGuessSerializer(data=request.data)
@@ -217,7 +224,7 @@ class WordleGuess(APIView):
                 serializer = ActiveWordleSerializer(active_wordle)
                 
                 if active_wordle.guesses == WORDLE_NUM_GUESSES or active_wordle.solved:
-                    DailyWordle.objects.create(
+                    Wordle.objects.create(
                         player=request.user, 
                         word=active_wordle.word,
                         guesses=active_wordle.guesses,
@@ -244,41 +251,97 @@ class WordleGuess(APIView):
 #     def get(self, request, pk):
 #         pass
 
-class DailyWordleViewSet(viewsets.ViewSet):
+class WordleViewSet(viewsets.ViewSet):
     """
-    A simple ViewSet for listing or retrieving DailyWordles.
+    A simple ViewSet for listing or retrieving Wordles.
     """
     def list(self, request):
-        queryset = DailyWordle.objects.all()
-        serializer = DailyWordleSerializer(queryset, many=True)
+        queryset = Wordle.objects.all()
+        serializer = WordleSerializer(queryset, many=True)
         return Response(serializer.data)
 
     def retrieve(self, request, pk=None):
-        queryset = DailyWordle.objects.all()
+        queryset = Wordle.objects.all()
         daily_wordle = get_object_or_404(queryset, pk=pk)
-        serializer = DailyWordleSerializer(daily_wordle)
+        serializer = WordleSerializer(daily_wordle)
         return Response(serializer.data)
 
 
 class WordlesToday(APIView):
     authentication_classes = [SessionAuthentication]
     permission_classes = [IsAuthenticated]
-    serializer_class = DailyWordleSerializer
+    serializer_class = WordleSerializer
 
     def get(self, request):
-        queryset = DailyWordle.objects.filter(date=timezone.now().date()).order_by('fail', 'guesses', 'time')
-        serializer = DailyWordleSerializer(queryset, many=True)
+        queryset = Wordle.objects.filter(
+            date=timezone.now().date()
+        ).order_by('fail', 'guesses', 'time').annotate(
+            rank=Window(
+                expression=RowNumber(),
+                order_by=['fail', 'guesses', 'time']
+            )
+        )
+        serializer = WordleSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+
+class WordleLeaders(APIView):
+    authentication_classes = [SessionAuthentication]
+    permission_classes = []
+    serializer_class = WordleSerializer
+
+    def get(self, request):
+
+        players = Player.objects.annotate(avg_guesses=Avg('wordle__guesses'), avg_time=Avg('wordle__time'))
+        
+        if len(players) > 0:
+            players_best_avg_time = players.order_by('avg_time')[:5]
+            players_best_avg_guesses = players.order_by('avg_guesses')[:5]
+            print(players_best_avg_time, flush=True)
+            print(players_best_avg_guesses, flush=True)
+
+
+        return Response(status=status.HTTP_200_OK)
+
+class WordleLeadersTime(APIView):
+    authentication_classes = [SessionAuthentication]
+    permission_classes = []
+    serializer_class = PlayerWordleTimeSerializer
+
+    def get(self, request):
+
+        players = Player.objects.annotate(avg_time=Avg('wordle__time'))
+
+        queryset = players.order_by('avg_time')[:5]
+        print(queryset, flush=True)
+        
+        serializer = PlayerWordleTimeSerializer(queryset, many=True)
+        print(queryset, flush=True)
+
+        return Response(serializer.data)
+
+
+class WordleLeadersGuesses(APIView):
+    authentication_classes = [SessionAuthentication]
+    permission_classes = []
+    serializer_class = PlayerWordleGuessesSerializer
+
+    def get(self, request):
+
+        queryset = Player.objects.annotate(avg_guesses=Avg('wordle__guesses')).order_by('avg_guesses')[:5]
+        
+        serializer = PlayerWordleGuessesSerializer(queryset, many=True)
         return Response(serializer.data)
 
 
 class WordleWallOfShame(APIView):
     authentication_classes = [SessionAuthentication]
     permission_classes = [IsAuthenticated]
-    serializer_class = DailyWordleSerializer
+    serializer_class = WordleSerializer
 
     def get(self, request):
-        queryset = DailyWordle.objects.filter(fail=True)
-        serializer = DailyWordleSerializer(queryset, many=True)
+        queryset = Wordle.objects.filter(fail=True)
+        serializer = WordleSerializer(queryset, many=True)
         return Response(serializer.data)
 
 class EventList(APIView):

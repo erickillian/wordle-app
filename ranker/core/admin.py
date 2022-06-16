@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.models import Group
 from django.utils.translation import gettext_lazy as _
 
-from .models import Player, Match, DailyWordle, ActiveWordle
+from .models import Player, Match, Wordle, ActiveWordle
 
 admin.site.site_title = _('Ranker Content Management')
 admin.site.site_header = _('Ranker Content Management')
@@ -10,4 +10,4 @@ admin.site.index_title = _('Content Management')
 
 admin.site.unregister(Group)
 admin.site.register([Player, Match])
-admin.site.register([DailyWordle, ActiveWordle])
+admin.site.register([Wordle, ActiveWordle])

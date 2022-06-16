@@ -1,8 +1,9 @@
 
+from numpy import require
 from rest_framework import serializers
 from ranker.core.constants.wordle import WORDLE_NUM_GUESSES
 
-from ranker.core.models import Player, Event, Match, RatingHistory, CustomAccountManager, DailyWordle
+from ranker.core.models import Player, Event, Match, RatingHistory, CustomAccountManager, Wordle
 from allauth.account import app_settings as allauth_settings
 from allauth.utils import email_address_exists
 from allauth.account.adapter import get_adapter
@@ -73,6 +74,22 @@ class PlayerSerializer(serializers.ModelSerializer):
         model = Player
         fields = '__all__'
 
+class PlayerWordleGuessesSerializer(serializers.ModelSerializer):
+    full_name = serializers.ReadOnlyField()
+    avg_guesses = serializers.DecimalField(max_digits=10, decimal_places=2)
+
+    class Meta:
+        model = Player
+        fields = ['full_name', 'avg_guesses', 'id']
+
+class PlayerWordleTimeSerializer(serializers.ModelSerializer):
+    full_name = serializers.ReadOnlyField()
+    avg_time = serializers.DurationField()
+
+    class Meta:
+        model = Player
+        fields = ['full_name', 'avg_time', 'id']
+
 
 class EventSerializer(serializers.ModelSerializer):
     
@@ -129,9 +146,10 @@ def valid_num_guesses(guesses):
 class WordleGuessSerializer(serializers.Serializer):
     guess = serializers.CharField(max_length=5, validators=[valid_guess])
 
-class DailyWordleSerializer(serializers.ModelSerializer):
+class WordleSerializer(serializers.ModelSerializer):
     player_name = serializers.CharField(source='player.full_name', read_only=True)
     time = serializers.DurationField()
+    rank = serializers.IntegerField(required=False)
     class Meta:
-        model = DailyWordle
+        model = Wordle
         fields = '__all__'

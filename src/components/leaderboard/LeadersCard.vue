@@ -18,14 +18,16 @@
             <v-list-item>
               <v-list-item-content class="ml-2 text-center">
                 <v-list-item-title>
-                  <v-icon
-                    dense
-                    v-if="index + 1 <= 3"
-                    :class="$store.state.placeClasses[index + 1]"
-                  >
-                    mdi-star-circle
-                  </v-icon>
+                  <v-list-item>
+                    <v-icon
+                        dense
+                        v-if="index + 1 <= 3"
+                        :class="$store.state.placeClasses[index + 1]"
+                    >
+                        mdi-star-circle
+                    </v-icon>
                   {{ leader.name }}
+                  </v-list-item>
                 </v-list-item-title>
               </v-list-item-content>
               <v-list-item-content class="subtitle-1 text-center">

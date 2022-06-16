@@ -13,4 +13,10 @@ export default {
     shame() {
         return session.get('api/v1/wordle/shame', {});
     },
+    guessesLeaders() {
+        return session.get('api/v1/wordle/leaders/guesses', {});
+    },
+    timeLeaders() {
+        return session.get('api/v1/wordle/leaders/time', {});
+    },
 };
