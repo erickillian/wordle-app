@@ -6,7 +6,7 @@
         </v-subheader>
         <v-data-table
             :headers="headers"
-            :items="wordles"
+            :items="items"
             :items-per-page="items_per_page"
             class="elevation-1"
             @click:row="playerClick"
@@ -54,17 +54,20 @@ export default {
   props: {
     title: String,
     icon: String,
-    wordles: Array,
+    items: Array,
     headers: Array,
     items_per_page: Number,
     hide_footer: Boolean,
   },
   methods: {
     playerClick(row) {
-        this.wordles.map((wordle) => {
-            if (wordle == row) {
-                let url = `/players/${wordle.player}`
-                this.$router.push(url)
+        this.items.map((item) => {
+            if (item == row) {
+                if (item.player) {
+                    this.$router.push(`/players/${item.player}`)
+                } else if (item.id) {
+                    this.$router.push(`/players/${item.id}`)
+                }
             }
         })
     },

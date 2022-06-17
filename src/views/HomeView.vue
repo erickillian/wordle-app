@@ -26,7 +26,7 @@
                 <WordleListCard
                     title="Todays Convergles"
                     icon="mdi-trophy"
-                    :wordles="$store.state.leaderboards.wordle.today"
+                    :items="$store.state.leaderboards.wordle.today"
                     :headers="todays_wordle_headers"
                     :items_per_page="10"
                     :hide_footer="false"
@@ -41,7 +41,7 @@
                 <WordleListCard
                     title="Top Average Guesses"
                     icon="mdi-trophy"
-                    :wordles="$store.state.leaderboards.wordle.leaders.avg_guesses"
+                    :items="$store.state.leaderboards.wordle.leaders.avg_guesses"
                     :headers="avg_guesses_headers"
                     :items_per_page="5"
                     :hide_footer="true"
@@ -51,7 +51,7 @@
                 <WordleListCard
                     title="Top Average Time"
                     icon="mdi-trophy"
-                    :wordles="$store.state.leaderboards.wordle.leaders.avg_time"
+                    :items="$store.state.leaderboards.wordle.leaders.avg_time"
                     :headers="avg_time_headers"
                     :items_per_page="5"
                     :hide_footer="true"
@@ -63,7 +63,7 @@
                 <WordleListCard
                     title="Convergle Wall of Shame"
                     icon="mdi-alert-outline"
-                    :wordles="$store.state.leaderboards.wordle.shame"
+                    :items="$store.state.leaderboards.wordle.shame"
                     :headers="wall_of_shame_headers"
                     :items_per_page="-1"
                     :hide_footer="true"

@@ -21,6 +21,7 @@ export const ENGLISH_TRANSLATIONS = {
         "name": "Players",
         "search": "Find Player",
         "name_col": "Name",
+        "avg_guess_col": "Avg Guesses",
         "rating_col": "Rating",
         "city_col": "City"
     },

@@ -36,7 +36,7 @@
             <tr @click="onRowClicked(item)"
             :class="{'blue lighten-3': item.id === $store.state.player.list.selectedId}">
               <td class="text-start"><b>{{ item.full_name }}</b></td>
-              <td class="text-start">{{ item.rating }}</td>
+              <td class="text-start">{{ item.avg_guesses }}</td>
             </tr>
           </template>
         </v-data-table>

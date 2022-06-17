@@ -42,7 +42,7 @@ export default new Vuex.Store({
                 content: [],
                 columns: [
                     { text: i18n.t("players_list.name_col"), value: "full_name", width: 180 },
-                    { text: i18n.t("players_list.rating_col"), value: 'rating', width: 100 },
+                    { text: i18n.t("players_list.avg_guess_col"), value: 'avg_guesses', width: 100 },
                 ]
             },
             details: {

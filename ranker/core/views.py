@@ -23,8 +23,6 @@ from ranker.core.models import (
 )
 from ranker.core.serializers import (
     PlayerSerializer,
-    PlayerWordleGuessesSerializer,
-    PlayerWordleTimeSerializer,
     EventSerializer,
     RatingHistorySerializer,
     MatchHistorySerializer,
@@ -78,7 +76,7 @@ class PlayerList(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        players = Player.objects.all()
+        players = Player.objects.annotate(avg_guesses=Avg('wordle__guesses'))
         serializer = PlayerSerializer(players, many=True)
         return Response(serializer.data)
 
@@ -92,7 +90,7 @@ class PlayerDetail(APIView):
 
     def get(self, request, player_id):
         try:
-            player = Player.objects.get(pk=player_id)
+            player = Player.objects.annotate(avg_guesses=Avg('wordle__guesses')).get(pk=player_id)
             serializer = PlayerSerializer(player)
             response = Response(serializer.data)
         except Player.DoesNotExist:
@@ -111,6 +109,40 @@ class PlayerRatingHistory(APIView):
         try:
             player = PlayerRating.objects.get(pk=player_id)
             serializer = RatingHistorySerializer(player.rating_history_days, many=True)
+            return Response(serializer.data)
+        except PlayerRating.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+class PlayerWordleStats(APIView):
+    """
+    Player history rating for charts
+    """
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, player_id):
+        try:
+            player = PlayerRating.objects.get(pk=player_id)
+            serializer = RatingHistorySerializer(player.rating_history_days, many=True)
+            return Response(serializer.data)
+        except PlayerRating.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+class PlayerWordleGuessDistribution(APIView):
+    def get(self, request, player_id):
+        try:
+            queryset = Wordle.objects.filter(player=player_id).order_by('date')
+            serializer = WordleSerializer(queryset, many=True)
+            return Response(serializer.data)
+        except PlayerRating.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+class PlayerWordles(APIView):
+    def get(self, request, player_id):
+        try:
+            queryset = Wordle.objects.filter(player=player_id).order_by('date')
+            serializer = WordleSerializer(queryset, many=True)
             return Response(serializer.data)
         except PlayerRating.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
@@ -142,18 +174,6 @@ class PlayerStats(APIView):
             return Response(stats)
         except PlayerRating.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
-
-
-class PlayerWordles(APIView):
-    def get(self, request, player_id):
-        try:
-            queryset = Wordle.objects.filter(player=player_id).order_by('date')
-            serializer = WordleSerializer(queryset, many=True)
-            return Response(serializer.data)
-        except PlayerRating.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-
 
 class WordleStatus(APIView):
     authentication_classes = [SessionAuthentication]
@@ -284,53 +304,27 @@ class WordlesToday(APIView):
         serializer = WordleSerializer(queryset, many=True)
         return Response(serializer.data)
 
-
-class WordleLeaders(APIView):
-    authentication_classes = [SessionAuthentication]
-    permission_classes = []
-    serializer_class = WordleSerializer
-
-    def get(self, request):
-
-        players = Player.objects.annotate(avg_guesses=Avg('wordle__guesses'), avg_time=Avg('wordle__time'))
-        
-        if len(players) > 0:
-            players_best_avg_time = players.order_by('avg_time')[:5]
-            players_best_avg_guesses = players.order_by('avg_guesses')[:5]
-            print(players_best_avg_time, flush=True)
-            print(players_best_avg_guesses, flush=True)
-
-
-        return Response(status=status.HTTP_200_OK)
-
 class WordleLeadersTime(APIView):
     authentication_classes = [SessionAuthentication]
-    permission_classes = []
-    serializer_class = PlayerWordleTimeSerializer
+    permission_classes = [IsAuthenticated]
+    serializer_class = PlayerSerializer
 
     def get(self, request):
 
-        players = Player.objects.annotate(avg_time=Avg('wordle__time'))
-
-        queryset = players.order_by('avg_time')[:5]
-        print(queryset, flush=True)
-        
-        serializer = PlayerWordleTimeSerializer(queryset, many=True)
-        print(queryset, flush=True)
-
+        queryset = Player.objects.annotate(avg_time=Avg('wordle__time')).order_by('avg_time')[:5]       
+        serializer = PlayerSerializer(queryset, many=True)
         return Response(serializer.data)
 
 
 class WordleLeadersGuesses(APIView):
     authentication_classes = [SessionAuthentication]
-    permission_classes = []
-    serializer_class = PlayerWordleGuessesSerializer
+    permission_classes = [IsAuthenticated]
+    serializer_class = PlayerSerializer
 
     def get(self, request):
 
         queryset = Player.objects.annotate(avg_guesses=Avg('wordle__guesses')).order_by('avg_guesses')[:5]
-        
-        serializer = PlayerWordleGuessesSerializer(queryset, many=True)
+        serializer = PlayerSerializer(queryset, many=True)
         return Response(serializer.data)
 
 

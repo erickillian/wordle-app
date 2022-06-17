@@ -64,32 +64,11 @@ class RegisterSerializer(serializers.Serializer):
 
 class PlayerSerializer(serializers.ModelSerializer):
     full_name = serializers.ReadOnlyField()
-    rating = serializers.DecimalField(
-        max_digits=10,
-        decimal_places=2,
-        source="playerrating.rating"
-    )
-
+    avg_guesses = serializers.DecimalField(max_digits=10, decimal_places=2, required=False)
+    avg_time = serializers.DurationField(required=False)
     class Meta:
         model = Player
-        fields = '__all__'
-
-class PlayerWordleGuessesSerializer(serializers.ModelSerializer):
-    full_name = serializers.ReadOnlyField()
-    avg_guesses = serializers.DecimalField(max_digits=10, decimal_places=2)
-
-    class Meta:
-        model = Player
-        fields = ['full_name', 'avg_guesses', 'id']
-
-class PlayerWordleTimeSerializer(serializers.ModelSerializer):
-    full_name = serializers.ReadOnlyField()
-    avg_time = serializers.DurationField()
-
-    class Meta:
-        model = Player
-        fields = ['full_name', 'avg_time', 'id']
-
+        fields = ['full_name', 'id', 'avg_guesses', 'avg_time']
 
 class EventSerializer(serializers.ModelSerializer):
     
