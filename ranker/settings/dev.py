@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(SETTINGS_DIR))
 SECRET_KEY = 'development_secret_key'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 # CORS_EXPOSE_HEADERS = ['Content-Type', 'X-CSRFToken']
 # CORS_ALLOW_CREDENTIALS = True
@@ -45,7 +45,11 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
+    # 'ranker.wordle',
     'ranker.core',
+    'ranker.users',
+    
+    
 ]
 
 MIDDLEWARE = [
@@ -209,7 +213,7 @@ USE_TZ = False
 # ]
 
 # Extendable user model
-AUTH_USER_MODEL = 'core.Player'
+AUTH_USER_MODEL = 'users.Player'
 ACCOUNT_EMAIL_VERIFICATION = "none"
 ACCOUNT_UNIQUE_EMAIL=True
 ACCOUNT_EMAIL_REQUIRED = False
@@ -224,7 +228,7 @@ else:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 REST_AUTH_REGISTER_SERIALIZERS = {
-    'REGISTER_SERIALIZER': 'ranker.core.serializers.RegisterSerializer',
+    'REGISTER_SERIALIZER': 'ranker.users.serializers.RegisterSerializer',
 }
 
 # Static files (CSS, JavaScript, Images)

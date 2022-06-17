@@ -3,145 +3,9 @@ from django.db.models import Sum
 from django.db.models.functions import Coalesce
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-
-from django.contrib.postgres.fields import ArrayField
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
-
 from ranker.core.rankings import EloRating
-import json
-import os
-import random
 
-
-
-from ranker.core.constants.wordle import WORDLE_MAX_LENGTH, WORDLE_NUM_GUESSES
-from ranker.settings.dev import BASE_DIR
-
-
-class CustomAccountManager(BaseUserManager):
-
-    def create_superuser(self, email, username, firstname, lastname, password, **other_fields):
-        """
-        Creates and saves a superuser with the given info.
-        """
-
-        other_fields.setdefault('is_staff', True)
-        other_fields.setdefault('is_superuser', True)
-        other_fields.setdefault('is_active', True)
-
-        if other_fields.get('is_staff') != True:
-            raise ValueError(
-                'Superuser must be assigned to is_staff=True.'
-            )
-        if other_fields.get('is_superuser') != True:
-            raise ValueError(
-                'Superuser must be assigned to is_superuser=True.'
-            )
-
-        return self.create_user(email, username, firstname, lastname, password, **other_fields)
-
-    def create_user(self, email, username, firstname, lastname, password, **other_fields):
-        """
-        Creates and saves a user with the given info.
-        """
-        if not email:
-            raise ValueError(_('You must provide an email address'))
-
-        if not username:
-            raise ValueError(_('You must provide an user name'))
-
-        email = BaseUserManager.normalize_email(email)
-        user = Player(email=email, username=username,
-                          firstname=firstname, lastname=lastname, **other_fields)
-
-        user.set_password(password)
-        user.save()
-        return user
-
-class Player(AbstractBaseUser, PermissionsMixin):
-    """Table for keeping player information."""
-    email = models.EmailField(_('email address'), unique=True)
-    username = models.CharField(max_length=150, unique=True)
-    firstname = models.CharField(max_length=150, blank=True)
-    lastname = models.CharField(max_length=150, blank=True)
-    is_staff = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=True)
-
-    objects = CustomAccountManager()
-
-    USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['email', 'firstname', 'lastname']
-
-    def __str__(self):
-        """Display player's full name as string object representation."""
-        return self.full_name
-
-    @property
-    def full_name(self):
-        """The players full name, first plus last name."""
-        full_name = f'{self.firstname} {self.lastname}'
-        return full_name
-
-    class Meta:
-        db_table = 'player'
-        verbose_name = ('player')
-        verbose_name_plural = ('players')
-
-class ActiveWordle(models.Model):
-    player = models.OneToOneField(Player, on_delete=models.CASCADE)
-    start_time = models.DateTimeField(auto_now_add=True)
-    guess_history = models.CharField(max_length=WORDLE_MAX_LENGTH*WORDLE_NUM_GUESSES, blank=True)
-    word = models.CharField(max_length=WORDLE_MAX_LENGTH, blank=False)
-
-    @property
-    def solved(self):
-        return self.guess_history[-WORDLE_MAX_LENGTH:] == self.word
-
-    @property
-    def date(self):
-        return self.start_time.date()
-
-    @property
-    def correct(self):
-        correct = ""
-        for i in range(0, int(len(self.guess_history) / WORDLE_MAX_LENGTH)):
-            guess = self.guess_history[i*WORDLE_MAX_LENGTH:(i+1)*WORDLE_MAX_LENGTH]
-            word_copy = list(self.word)
-            for j, letter in enumerate(guess):
-                if letter == self.word[j]:
-                    correct += "2"
-                    if letter in word_copy:
-                        word_copy.pop(word_copy.index(letter))
-                elif letter in word_copy:
-                    correct += "1"
-                    word_copy.pop(word_copy.index(letter))
-                else:
-                    correct += "0"
-                j += 1
-        return correct
-
-    @property
-    def guesses(self):
-        return int(len(self.guess_history) / WORDLE_MAX_LENGTH)
-
-    class Meta:
-        db_table = 'active_wordle'
-        verbose_name = ('active_wordle')
-        verbose_name_plural = ('active_wordles')
-            
-
-class Wordle(models.Model):
-    player = models.ForeignKey(Player, default=None,on_delete=models.CASCADE)
-    word = models.CharField(max_length=5, blank=False)
-    guesses = models.PositiveSmallIntegerField(blank=False)
-    date = models.DateField(auto_now_add=True, blank=False)
-    time = models.DurationField()
-    fail = models.BooleanField(blank=False)
-    class Meta:
-        db_table = 'wordle'
-        verbose_name = ('wordle')
-        verbose_name_plural = ('wordles')
-
+from ranker.users.models import Player
 
 class Match(models.Model):
     """Table for keeping track of game scores and winners."""
@@ -347,7 +211,7 @@ class Event(models.Model):
 # Only used to generate rating history reports, not populated in database
 class RatingHistory(models.Model):
     player = models.ForeignKey(
-        'Player',
+        Player,
         db_index=True,
         verbose_name=('player'),
         null=False,
@@ -358,3 +222,4 @@ class RatingHistory(models.Model):
 
     def __str__(self):
         return "{0} {1} {2}".format(self.player.full_name, self.date, self.rating)
+        
