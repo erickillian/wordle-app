@@ -63,7 +63,7 @@
                     :headers="todays_wordle_headers"
                     :items_per_page="10"
                     :hide_footer="false"
-                    :key=playerStats.id
+                    :key=playerWordles
                 />
                 <!-- <template v-slot:item.event_date="{ item }">
                   {{ item.event_date | date}}
