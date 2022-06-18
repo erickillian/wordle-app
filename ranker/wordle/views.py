@@ -3,7 +3,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from django.utils import timezone
 from django.forms.models import model_to_dict
-from django.db.models import Avg
+from django.db.models import Avg, Count
 from django.db.models.expressions import Window
 from django.db.models.functions import RowNumber
 from django.db.models import F
@@ -198,7 +198,7 @@ class WordleLeadersTime(APIView):
 
     def get(self, request):
 
-        queryset = Player.objects.annotate(avg_time=Avg('wordle__time')).order_by('avg_time')[:5]       
+        queryset = Player.objects.annotate(avg_time=Avg('wordle__time'), total_wordles=Count('wordle')).filter(total_wordles__gte=10).order_by('avg_time')[:5]       
         serializer = PlayerSerializer(queryset, many=True)
         return Response(serializer.data)
 
@@ -210,7 +210,9 @@ class WordleLeadersGuesses(APIView):
 
     def get(self, request):
 
-        queryset = Player.objects.annotate(avg_guesses=Avg('wordle__guesses')).order_by('avg_guesses')[:5]
+        queryset = Player.objects.annotate(avg_guesses=Avg('wordle__guesses'), total_wordles=Count('wordle')).filter(total_wordles__gte=10).order_by('avg_guesses')[:5]
+        for player in queryset:
+            print(player, flush=True)
         serializer = PlayerSerializer(queryset, many=True)
         return Response(serializer.data)
 
