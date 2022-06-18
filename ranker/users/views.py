@@ -6,6 +6,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
+import json
+
 
 from ranker.core.models import (
     PlayerRating,
@@ -83,9 +85,18 @@ class PlayerWordleStats(APIView):
 class PlayerWordleGuessDistribution(APIView):
     def get(self, request, player_id):
         try:
-            queryset = Wordle.objects.filter(player=player_id).order_by('date')
-            serializer = WordleSerializer(queryset, many=True)
-            return Response(serializer.data)
+            queryset = Wordle.objects.filter(player=player_id).values('guesses', 'fail')
+            response = {}
+
+            for wordle in queryset:
+                if not wordle['fail']:
+                    guesses = wordle['guesses']
+                    if str(guesses) not in response:
+                        response.setdefault(guesses, 1)
+                    else:
+                        response[guesses] += 1
+
+            return Response(response)
         except PlayerRating.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 

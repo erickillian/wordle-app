@@ -92,6 +92,7 @@
 
 <script>
 import { mapActions, mapState } from 'vuex';
+import JSConfetti from 'js-confetti'
 
 // CONSTANTS
 const WORD_LENGTH = 5;
@@ -301,6 +302,10 @@ export default {
                 this.twirlWinningTiles();
                 this.word = this.$store.state.wordle.info.guess_history.slice(-WORD_LENGTH);
                 this.winOverlay = true;
+                const jsConfetti = new JSConfetti()
+                jsConfetti.addConfetti({
+                    confettiNumber: 500,
+                })
             } else {
                 this.startInteraction()
             }
