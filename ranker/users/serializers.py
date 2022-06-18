@@ -62,8 +62,10 @@ class PlayerSerializer(serializers.ModelSerializer):
     full_name = serializers.ReadOnlyField()
     avg_guesses = serializers.DecimalField(max_digits=10, decimal_places=2, required=False)
     avg_time = serializers.DurationField(required=False)
+    total_wordles = serializers.IntegerField(required=False)
+    fails = serializers.IntegerField(required=False)
     class Meta:
         model = Player
-        fields = ['full_name', 'id', 'avg_guesses', 'avg_time']
+        fields = ['full_name', 'id', 'avg_guesses', 'avg_time', 'total_wordles', 'fails', 'firstname', 'lastname']
 
 

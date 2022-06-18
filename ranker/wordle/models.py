@@ -42,10 +42,9 @@ class ActiveWordle(models.Model):
         return int(len(self.guess_history) / WORDLE_MAX_LENGTH)
 
     class Meta:
-        app_label = 'ActiveWordle'
         db_table = 'active_wordle'
-        verbose_name = ('active_wordle')
-        verbose_name_plural = ('active_wordles')
+        verbose_name = ('Active Wordle')
+        verbose_name_plural = ('Active Wordles')
             
 
 class Wordle(models.Model):

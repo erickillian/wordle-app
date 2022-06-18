@@ -1,5 +1,4 @@
 import wordle from '../api/wordle';
-import session from '../api/session';
 import {
     WORDLE_STATUS_BEGIN,
     WORDLE_STATUS_ERROR,

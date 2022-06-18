@@ -6,6 +6,7 @@ import i18n from '../i18n'
 import session from '../api/session';
 import auth from './auth';
 import password from './password';
+import player from './player';
 import wordle from './wordle';
 import leaderboards from './leaderboards';
 // import signup from './signup';
@@ -17,6 +18,7 @@ export default new Vuex.Store({
     modules: {
         auth,
         wordle,
+        player,
         password,
         leaderboards,
     },
@@ -36,7 +38,7 @@ export default new Vuex.Store({
                 today: [],
             },
         },
-        player: {
+        player2: {
             list: {
                 selectedId: -1,
                 content: [],
@@ -86,28 +88,28 @@ export default new Vuex.Store({
             state.isLoading = isLoading
         },
         SET_PLAYER_LIST(state, playerList) {
-            state.player.list.content = playerList
+            state.player2.list.content = playerList
         },
         SET_SELECTED_PLAYER_ID(state, selectedId) {
-            state.player.list.selectedId = selectedId
+            state.player2.list.selectedId = selectedId
         },
         SET_PLAYER_NOT_FOUND(state) {
-            state.player.details.notFound = true
+            state.player2.details.notFound = true
         },
         SET_PLAYER_FOUND(state) {
-            state.player.details.notFound = false
+            state.player2.details.notFound = false
         },
         SET_PLAYER_INFO(state, playerInfo) {
-            state.player.details.playerInfo = playerInfo
+            state.player2.details.playerInfo = playerInfo
         },
         SET_PLAYER_STATS(state, playerStats) {
-            state.player.details.playerStats = playerStats
+            state.player2.details.playerStats = playerStats
         },
         SET_PLAYER_RATING_HISTORY(state, ratingHistory) {
-            state.player.details.ratingHistory = ratingHistory
+            state.player2.details.ratingHistory = ratingHistory
         },
         SET_PLAYER_MATCH_HISTORY(state, matchHistory) {
-            state.player.details.matchHistory = matchHistory
+            state.player2.details.matchHistory = matchHistory
         },
         SET_EVENTS_LIST(state, eventsList) {
             state.event.list.content = eventsList

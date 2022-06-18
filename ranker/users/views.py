@@ -1,4 +1,4 @@
-from django.db.models import Avg
+from django.db.models import Avg, Count, Case, When
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 
@@ -12,6 +12,13 @@ from ranker.core.models import (
 )
 from ranker.core.serializers import (
     RatingHistorySerializer,
+    MatchHistorySerializer,
+)
+from ranker.wordle.models import (
+    Wordle,
+)
+from ranker.wordle.serializers import (
+    WordleSerializer
 )
 
 from ranker.users.models import (
@@ -62,8 +69,13 @@ class PlayerWordleStats(APIView):
 
     def get(self, request, player_id):
         try:
-            player = PlayerRating.objects.get(pk=player_id)
-            serializer = RatingHistorySerializer(player.rating_history_days, many=True)
+            queryset = Player.objects.annotate(
+                avg_guesses=Avg('wordle__guesses'), 
+                avg_time=Avg('wordle__time'), 
+                total_wordles=Count('wordle'),
+                fails=Count(Case(When(wordle__fail=True, then=1)))
+            ).get(pk=player_id)
+            serializer = PlayerSerializer(queryset)
             return Response(serializer.data)
         except PlayerRating.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)

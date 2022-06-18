@@ -68,20 +68,20 @@
               <p class="overline">{{ $t('player_card.chart.name') }}</p>
               <line-chart
               :height="155"
-              :chartData="chartData"
+              :chartData={}
               :options="chartOptions" />
             </v-tab-item>
 
             <v-tab-item class="pa-2">
               <p class="overline">{{ $t('player_card.history.name') }}</p>
-              <v-data-table
-                :headers="$store.state.player.details.matchHistoryColumns"
-                :items="matchHistory"
-                :dense="true"
-                :items-per-page="10"
-                :hide-default-footer="true"
-                class="elevation-0"
-              >
+              <WordleListCard
+                    title="Convergle History"
+                    icon="mdi-history"
+                    :items="playerWordles"
+                    :headers="todays_wordle_headers"
+                    :items_per_page="10"
+                    :hide_footer="false"
+                />
                 <!-- <template v-slot:item.event_date="{ item }">
                   {{ item.event_date | date}}
                 </template>
@@ -91,7 +91,6 @@
                 <template v-slot:item.delta="{ item }">
                   <span :class="getDeltaClass(item)">{{ getDeltaValue(item) }}</span>
                 </template> -->
-              </v-data-table>
             </v-tab-item>
           </v-tabs>
         </v-col>
@@ -102,23 +101,34 @@
 
 <script>
 import LineChart from "@/components/LineChart"
-
+import WordleListCard from "@/components/leaderboard/WordleListCard"
 
 export default {
-  components: { LineChart },
+  components: { LineChart, WordleListCard },
   props: {
-    playerInfo: Object,
+    // playerInfo: Object,
     playerStats: Object,
-    ratingHistory: Array,
-    matchHistory: Array
+    playerWordles: Array,
+    // ratingHistory: Array,
+    // matchHistory: Array
   },
   data() {
     return {
-      chartOptions: {
-        legend: {
-          display: false
+        todays_wordle_headers: [
+            { 
+                text: 'Word',
+                value: 'word',
+                sortable: true,
+            },
+            { text: 'Guesses', sortable: true, value: 'guesses' },
+            { text: 'Time', sortable: true, value: 'time' },
+            { text: 'Date', sortable: true, value: 'date' },
+        ],
+        chartOptions: {
+            legend: {
+                display: false
+            }
         }
-      }
     }
   },
   methods: {
@@ -139,72 +149,33 @@ export default {
   },
   computed: {
     fullname () {
-      return `${this.playerInfo.first_name} ${this.playerInfo.last_name}`
+      return `${this.playerStats.first_name} ${this.playerStats.last_name}`
     },
     statItems () {
       return [
-        
-        
         {
           icon: "mdi-account-outline",
           title: this.$t('player_card.info.fullname'),
-          subtitle: this.playerInfo.full_name
+          subtitle: this.playerStats.full_name
         },
         { 
           icon: "mdi-chart-donut",
-          title: `${this.$t('player_card.info.total_games')}: <b>${this.playerStats.total_games}</b>`,
-          subtitle: `( <span class="green--text text--accent-4 font-weight-bold">${this.playerStats.win_count}</span> /
-                      <span class="red--text text--accent-4 font-weight-bold">${this.playerStats.lose_count }</span> )
-                      ${this.$options.filters.percent(this.playerStats.win_count / this.playerStats.total_games, 2)}`
+          title: `${this.$t('player_card.info.total_wordles')}: ${this.playerStats.total_wordles}`,
+          subtitle: `${this.$options.filters.percent((this.playerStats.total_wordles - this.playerStats.fails) / this.playerStats.total_wordles, 2)} Solved`
         },
         {
           icon: "mdi-star",
-          title: `${this.$t('player_card.info.rating')}: <b>${this.$options.filters.round(
-            this.playerInfo.rating, 2
-          )}</b>`,
+          title: `${this.$t('player_card.info.avg_guesses')}: ${this.$options.filters.round(
+            this.playerStats.avg_guesses, 2
+          )}`,
         },
         {
           icon: "mdi-summit",
-          title: `${this.$t('player_card.info.best_rating')}: <b>${this.$options.filters.round(
-            this.playerStats.best_rating.rating, 2
-          )}</b>`,
-          subtitle: this.$options.filters.date(this.playerStats.best_rating.date)
+          title: `${this.$t('player_card.info.avg_time')}: ${this.playerStats.avg_time}`,
         },
-        // {
-        //   icon: "mdi-hand",
-        //   title: this.$t('player_card.info.hand'),
-        //   subtitle: this.$store.state.hands[this.playerInfo.hand]
-        // },
-        // {
-        //   icon: "mdi-rocket",
-        //   title: this.$t('player_card.info.equipment'),
-        //   subtitle: this.playerInfo.equipment
-        // }
       ]
 
     },
-    chartData () {
-      var label = this.fullname
-      var xlabels = []
-      var dataPoints = []
-
-      if (this.ratingHistory) {
-        this.ratingHistory.forEach((record, index) => {
-          dataPoints.push({ x: index, y: record.rating})
-          xlabels.push(record.date)
-        })
-      }
-
-      return {
-        labels: xlabels,
-        datasets: [{
-          borderColor: 'rgba(50, 115, 220, 0.5)',
-          backgroundColor: 'rgba(50, 115, 220, 0.1)',
-          label: label,
-          data: dataPoints
-        }]
-      }
-    }
   }
 };
 </script>

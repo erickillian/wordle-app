@@ -4,33 +4,30 @@
       <player-list @player-clicked="onPlayerClick"/>
     </v-navigation-drawer>
     <v-col> 
-      <player-card
-        v-if="$store.state.player.details.playerInfo"
-        :playerInfo="$store.state.player.details.playerInfo"
-        :playerStats="$store.state.player.details.playerStats"
-        :ratingHistory="$store.state.player.details.ratingHistory"
-        :matchHistory="$store.state.player.details.matchHistory"
-
-      />
-      <v-card v-else>
-        <v-card-title primary-title align-center>
-          <v-icon left>
-            mdi-arrow-left-circle-outline
-          </v-icon>
-          <span>{{ $t("player_card.placeholder") }}</span>
-        </v-card-title>
         <v-card-text
-          align-center
-          v-if="$store.state.player.details.notFound"
+            align-center
+            v-if="$store.state.player.not_found"
         >
-          <v-icon left class="red--text text--accent-2">
-            mdi-alert-circle-outline
-          </v-icon>
-          <span class="red--text text--accent-2">
-            {{ $t("player_card.notFound") }}
-          </span>
+            <v-icon left class="red--text text--accent-2">
+                mdi-alert-circle-outline
+            </v-icon>
+            <span class="red--text text--accent-2">
+                {{ $t("player_card.notFound") }}
+            </span>
         </v-card-text>
-      </v-card>
+        <player-card
+            v-else
+            :playerStats="$store.state.player.stats"
+            :playerWordles="$store.state.player.wordles"
+        />
+        <v-card>
+            <v-card-title primary-title align-center>
+                <v-icon left>
+                mdi-arrow-left-circle-outline
+                </v-icon>
+                <span>{{ $t("player_card.placeholder") }}</span>
+            </v-card-title>
+        </v-card>
     </v-col>
       <v-btn
         fab
@@ -66,12 +63,6 @@ export default {
     }
   },
   watch: {
-    '$route' (to, from) {
-      this.$store.dispatch('fetchPlayerDetails', to.params.id)
-    }
   },
-  created() {
-    this.$store.dispatch('fetchPlayerDetails', this.$route.params.id)
-  }
 }
 </script>

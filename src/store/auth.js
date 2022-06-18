@@ -150,7 +150,6 @@ const mutations = {
         state.registrationLoading = false;
     },
     [REGISTRATION_ERROR](state, error) {
-        console.log(error);
         state.registrationError = true;
         state.registrationLoading = false;
         state.registration_error.username = error.username;
