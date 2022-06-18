@@ -43,8 +43,15 @@
                 {{ item.guesses }}
                 </v-chip>
             </template>
+            <template v-slot:[`item.streak`]="{ item }">
+                <v-list-item-title v-if="item.streak >= 3">
+                    <img v-if="item.streak >= 3" style="max-width: 20px; max-height: 20px" class="mr-3" src="/static/streak.png">
+                    {{ item.streak }}
+                </v-list-item-title>
+            </template>
         </v-data-table>
     </v-card>
+    
 </template>
 
 <script>

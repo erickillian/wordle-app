@@ -24,6 +24,11 @@ class ActiveWordle(models.Model):
         for i in range(0, int(len(self.guess_history) / WORDLE_MAX_LENGTH)):
             guess = self.guess_history[i*WORDLE_MAX_LENGTH:(i+1)*WORDLE_MAX_LENGTH]
             word_copy = list(self.word)
+
+            for j, letter in enumerate(guess):
+                if letter == self.word[j]:
+                    word_copy.pop(word_copy.index(letter))
+
             for j, letter in enumerate(guess):
                 if letter == self.word[j]:
                     correct += "2"

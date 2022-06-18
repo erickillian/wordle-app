@@ -55,26 +55,12 @@ def wordle_streak(player):
     for wordle in wordles:
         date = wordle['date']
         fail = wordle['fail']
-        print(date, flush=True)
-        print(fail, flush=True)
 
         if (not fail) and (date == streak_day):
             current_streak += 1
             streak_day -= datetime.timedelta(days=1)
         else:  # Awwww...
             break  # The current streak is done, exit the loop
-
-        print(current_streak, flush=True)
-
-        # # Get the difference btw the dates
-        # delta = compareDate - date['date']
-
-        # if delta.days == 1: # Keep the streak going!
-        #     current_streak += 1
-        # elif delta.days == 0: # Don't bother increasing the day if there's multiple ones on the same day
-        #     pass
-        # else: # Awwww...
-        #     break # The current streak is done, exit the loop
 
     return current_streak
 
