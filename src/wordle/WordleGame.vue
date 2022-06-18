@@ -305,6 +305,9 @@ export default {
                 const jsConfetti = new JSConfetti()
                 jsConfetti.addConfetti({
                     confettiNumber: 500,
+                    confettiColors: [
+                        '#3876bc', '#ffffff',
+                    ],
                 })
             } else {
                 this.startInteraction()
