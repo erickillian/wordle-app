@@ -51,7 +51,7 @@ export const ENGLISH_TRANSLATIONS = {
             "name": "Rating trend"
         },
         history: {
-            "name": "Latest matches",
+            "name": "Convergles",
             cols: {
                 "match_date": "Date",
                 "id": "Id",

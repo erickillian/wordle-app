@@ -29,7 +29,6 @@ const initialState = {
     selected_id: null,
     not_found: false,
 
-
     stats_loading: true,
     stats_error: false,
     stats: {},
@@ -59,6 +58,7 @@ const actions = {
     },
     wordles({ commit }, player_id) {
         if (player_id === undefined) {
+            console.log("Undefined")
             commit(PLAYER_NOT_FOUND);
         } else {
             commit(SELECT_PLAYER, player_id);

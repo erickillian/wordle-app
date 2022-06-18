@@ -3,35 +3,17 @@
     <v-card-title>
       <div class="overline">{{ $t("player_card.name") }}</div>
     </v-card-title>
-    <!-- <v-card-title class="py-0">
+    <v-card-title class="py-0">
         <v-row>
-          <v-col cols="4" md="2" class="text-center" justify="center">
-            <v-avatar size="60">
-              <img
-                src="https://eitrawmaterials.eu/wp-content/uploads/2016/09/empty-avatar.jpg"
-              >
-            </v-avatar>
-            <br>
-            <div :title="`${$t('player_card.rating')} ${playerInfo.rating}`">
-              <v-icon class="red--text text--lighten-1">mdi-star-circle-outline</v-icon>
-              <span
-              style="vertical-align:middle"
-              class="font-weight-bold blue--text subtitle-2">
-                {{ playerInfo.rating }}
-              </span>
-            </div>
-          </v-col>
           <v-col class="body-2 font-weight-light">
-            <p class="headline mb-1">{{ fullname }}</p>
-            <span class="font-weight-bold">{{ $t("player_card.city") }}:</span>
-            {{ playerInfo.city }}
+            <p class="headline mb-1">{{ playerStats.full_name }}</p>
+            <span class="font-weight-bold"></span>
+            {{ }}
             <br>
             <v-spacer></v-spacer>
-            <span class="font-weight-bold">{{ $t("player_card.date_of_birth") }}:</span>
-            {{ playerInfo.date_of_birth | date }}
           </v-col>
         </v-row>
-      </v-card-title> -->
+      </v-card-title>
       <v-card-text>
       <v-row>
         <v-col style="overflow: auto">
@@ -46,7 +28,7 @@
 
            <v-tab-item class="pa-2">
               <p class="overline">{{ $t('player_card.info.name') }}</p>
-              <v-list disabled v-if="playerStats">
+              <v-list disabled>
                 <v-list-item-group>
                   <v-list-item
                     v-for="(item, index) in statItems"
@@ -81,6 +63,7 @@
                     :headers="todays_wordle_headers"
                     :items_per_page="10"
                     :hide_footer="false"
+                    :key=playerStats.id
                 />
                 <!-- <template v-slot:item.event_date="{ item }">
                   {{ item.event_date | date}}

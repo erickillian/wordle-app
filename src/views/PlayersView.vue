@@ -1,7 +1,7 @@
 <template>
   <v-row dense class="mx-0" style="height: 100%">
     <v-navigation-drawer app :clipped="true" width="400" v-model="showSider">
-      <player-list @player-clicked="onPlayerClick"/>
+      <player-list @player-clicked="onPlayerClick" />
     </v-navigation-drawer>
     <v-col> 
         <v-card-text
@@ -16,7 +16,7 @@
             </span>
         </v-card-text>
         <player-card
-            v-else
+            v-if="!$store.state.player.stats_error"
             :playerStats="$store.state.player.stats"
             :playerWordles="$store.state.player.wordles"
         />

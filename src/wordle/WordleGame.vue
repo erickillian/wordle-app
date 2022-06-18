@@ -153,6 +153,7 @@ export default {
                 guess: '',
             },
             winOverlay: false,
+            guessed: false,
         };
     },
     methods: {
@@ -248,7 +249,11 @@ export default {
                 return word + tile.dataset.letter
             }, "") // returns a string
 
-            this.guess({ guess: guess });
+            if (this.guessed == false) {
+                this.guess({ guess: guess });
+                this.guessed = true;
+            }
+            
             // activeTiles.forEach((...params) => this.flipTile(...params, guess)) // flip tile animation
         },
         initialGuesses() {
@@ -290,9 +295,10 @@ export default {
         },
 
         checkWinLose() {
+            this.guessed = false;
             if (this.$store.state.wordle.info.solved == true) {
                 console.log("solved")
-                this.twirlWinningTiles()
+                this.twirlWinningTiles();
                 this.word = this.$store.state.wordle.info.guess_history.slice(-WORD_LENGTH);
                 this.winOverlay = true;
             } else {
@@ -398,6 +404,7 @@ export default {
                 const tile = allTiles[i]
                 setTimeout(() => {
                     tile.classList.add("twirl")
+                    tile.classList.add("rainbow");
                     tile.addEventListener(
                         "animationend",
                         () => {
