@@ -10,7 +10,7 @@
     "dependencies": {
         "@babel/core": "^7.18.2",
         "@babel/preset-env": "^7.18.2",
-        "@vue/eslint-config-standard": "^5.0.0",
+        "@vue/eslint-config-standard": "5.0.0",
         "axios": "^0.27.2",
         "chart.js": "^2.9.3",
         "core-js": "^3.3.2",
@@ -26,10 +26,10 @@
     },
     "devDependencies": {
         "@mdi/font": "^4.6.95",
-        "@vue/cli-plugin-babel": "^5.0.4",
-        "@vue/cli-plugin-eslint": "^5.0.4",
-        "@vue/cli-service": "^5.0.4",
-        "babel-eslint": "^10.0.3",
+        "@vue/cli-plugin-babel": "^5.0.6",
+        "@vue/cli-plugin-eslint": "^5.0.6",
+        "@vue/cli-service": "^5.0.6",
+        "@babel/eslint-parser": "^7.18.2",
         "css-loader": "^3.2.0",
         "deepmerge": "^4.2.2",
         "eslint": "^8.16.0",
