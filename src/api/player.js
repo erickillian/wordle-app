@@ -10,4 +10,7 @@ export default {
     wordles(player_id) {
         return session.get(`/api/v1/player/${player_id}/wordles`);
     },
+    guess_distribution(player_id) {
+        return session.get(`/api/v1/player/${player_id}/wordle/guess_distribution`);
+    },
 };

@@ -23,7 +23,7 @@
             grow
           >
             <v-tab :title="$t('player_card.info.name')"><v-icon>mdi-chart-bubble</v-icon></v-tab>
-            <v-tab :title="$t('player_card.chart.name')"><v-icon>mdi-chart-areaspline</v-icon></v-tab>
+            <v-tab title="Convergle Guess Distribution"><v-icon>mdi-chart-areaspline</v-icon></v-tab>
             <v-tab :title="$t('player_card.history.name')"><v-icon>mdi-file-chart-outline</v-icon></v-tab>
 
            <v-tab-item class="pa-2">
@@ -47,11 +47,13 @@
             </v-tab-item>
 
             <v-tab-item class="pa-2">
-              <p class="overline">{{ $t('player_card.chart.name') }}</p>
-              <line-chart
+              <p class="overline">Convergle Guess Distribution</p>
+              <BarChart
               :height="155"
-              :chartData={}
-              :options="chartOptions" />
+              :chartData="chartData"
+              :options="chartOptions"
+              :key=guessDistribution.guesses
+               />
             </v-tab-item>
 
             <v-tab-item class="pa-2">
@@ -63,7 +65,7 @@
                     :headers="todays_wordle_headers"
                     :items_per_page="10"
                     :hide_footer="false"
-                    :key=playerWordles
+                    :key=playerStats.id
                 />
                 <!-- <template v-slot:item.event_date="{ item }">
                   {{ item.event_date | date}}
@@ -83,18 +85,26 @@
 </template>
 
 <script>
-import LineChart from "@/components/LineChart"
+import BarChart from "@/components/BarChart"
 import WordleListCard from "@/components/leaderboard/WordleListCard"
 
 export default {
-  components: { LineChart, WordleListCard },
+  components: { BarChart, WordleListCard },
   props: {
     // playerInfo: Object,
     playerStats: Object,
-    playerWordles: Array,
+    playerWordles: [],
+    guessDistribution: Object,
     // ratingHistory: Array,
     // matchHistory: Array
   },
+    created() {
+        if (this.$route.params.id) {
+            this.$store.dispatch('player/stats', this.$route.params.id);
+            this.$store.dispatch('player/wordles', this.$route.params.id);
+            this.$store.dispatch('player/guessDistribution', this.$route.params.id);
+        }
+    },
   data() {
     return {
         todays_wordle_headers: [
@@ -110,8 +120,11 @@ export default {
         chartOptions: {
             legend: {
                 display: false
+            },
+            animation: {
+                duration: 0
             }
-        }
+        },
     }
   },
   methods: {
@@ -133,6 +146,17 @@ export default {
   computed: {
     fullname () {
       return `${this.playerStats.first_name} ${this.playerStats.last_name}`
+    },
+    chartData() {
+        return {
+            labels: this.guessDistribution.labels,//.guess_distribution.labels,
+            datasets: [ 
+                { 
+                    data: this.guessDistribution.data, //this.$store.player.guess_distribution.data ,
+                    backgroundColor: 'hsl(212, 54%, 30%)',
+                } 
+            ]
+        }
     },
     statItems () {
       return [
@@ -162,11 +186,3 @@ export default {
   }
 };
 </script>
-
-<style>
-  .v-data-table table tr td {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-</style>

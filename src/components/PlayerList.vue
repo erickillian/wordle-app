@@ -59,12 +59,11 @@ export default {
         onRowClicked(row) {
             this.$store.dispatch('player/wordles', row.id);
             this.$store.dispatch('player/stats', row.id);
+            this.$store.dispatch('player/guessDistribution', row.id);
             this.$emit('player-clicked', row.id)
         }
     },
     created() {
-        this.$store.dispatch('player/stats', this.$route.params.id);
-        this.$store.dispatch('player/wordles', this.$route.params.id);
         this.$store.dispatch('player/all');
     }
 }

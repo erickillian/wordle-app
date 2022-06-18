@@ -8,6 +8,7 @@ from rest_framework import status
 
 import json
 
+from ranker.wordle.constants.wordle import WORDLE_MAX_LENGTH, WORDLE_NUM_GUESSES
 
 from ranker.core.models import (
     PlayerRating,
@@ -83,27 +84,40 @@ class PlayerWordleStats(APIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
 class PlayerWordleGuessDistribution(APIView):
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def get(self, request, player_id):
         try:
-            queryset = Wordle.objects.filter(player=player_id).values('guesses', 'fail')
-            response = {}
+            queryset = Wordle.objects.filter(player=player_id).values('guesses', 'fail').order_by('guesses')
+            guess_distribution = {}
+
+            for i in range(1, WORDLE_NUM_GUESSES+1):
+                guess_distribution.setdefault(i, 0)
 
             for wordle in queryset:
                 if not wordle['fail']:
                     guesses = wordle['guesses']
-                    if str(guesses) not in response:
-                        response.setdefault(guesses, 1)
+                    if guesses not in guess_distribution:
+                        guess_distribution.setdefault(guesses, 1)
                     else:
-                        response[guesses] += 1
+                        guess_distribution[guesses] += 1
+
+            response = {}
+            response['labels'] = guess_distribution.keys()
+            response['data'] = guess_distribution.values()
 
             return Response(response)
         except PlayerRating.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
 class PlayerWordles(APIView):
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def get(self, request, player_id):
         try:
-            queryset = Wordle.objects.filter(player=player_id).order_by('date')
+            queryset = Wordle.objects.filter(player=player_id).order_by('-date')
             serializer = WordleSerializer(queryset, many=True)
             return Response(serializer.data)
         except PlayerRating.DoesNotExist:

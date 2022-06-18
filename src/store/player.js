@@ -9,6 +9,9 @@ import {
     PLAYER_WORDLES_BEGIN,
     PLAYER_WORDLES_ERROR,
     PLAYER_WORDLES_SUCCESS,
+    PLAYER_GUESS_DISTRIBUTION_BEGIN,
+    PLAYER_GUESS_DISTRIBUTION_ERROR,
+    PLAYER_GUESS_DISTRIBUTION_SUCCESS,
     PLAYER_ALL_BEGIN,
     PLAYER_ALL_ERROR,
     PLAYER_ALL_SUCCESS,
@@ -32,6 +35,10 @@ const initialState = {
     stats_loading: true,
     stats_error: false,
     stats: {},
+
+    guess_distribution_loading: true,
+    guess_distribution_error: false,
+    guess_distribution: {},
 
     wordles_loading: true,
     wordles_error: false,
@@ -61,12 +68,22 @@ const actions = {
             console.log("Undefined")
             commit(PLAYER_NOT_FOUND);
         } else {
-            commit(SELECT_PLAYER, player_id);
             console.log("Getting Wordles")
             commit(PLAYER_WORDLES_BEGIN);
             return player.wordles(player_id)
                 .then(({ data }) => commit(PLAYER_WORDLES_SUCCESS, data))
                 .catch((error) => commit(PLAYER_WORDLES_ERROR, error.response.data))
+        }
+    },
+    guessDistribution({ commit }, player_id) {
+        if (player_id === undefined) {
+            commit(PLAYER_NOT_FOUND);
+        } else {
+            console.log("Getting Guess Distribution")
+            commit(PLAYER_GUESS_DISTRIBUTION_BEGIN);
+            return player.guess_distribution(player_id)
+                .then(({ data }) => commit(PLAYER_GUESS_DISTRIBUTION_SUCCESS, data))
+                .catch((error) => commit(PLAYER_GUESS_DISTRIBUTION_ERROR, error.response.data))
         }
     },
     stats({ commit }, player_id) {
@@ -103,7 +120,7 @@ const mutations = {
         state.stats_loading = false
     },
     [PLAYER_WORDLES_BEGIN](state) {
-        state.wordles = {}
+        state.wordles = []
         state.wordles_loading = true
     },
     [PLAYER_WORDLES_SUCCESS](state, data) {
@@ -114,6 +131,19 @@ const mutations = {
     [PLAYER_WORDLES_ERROR](state, error) {
         state.wordles_error = true
         state.wordles_loading = false
+    },
+    [PLAYER_GUESS_DISTRIBUTION_BEGIN](state) {
+        state.guess_distribution = {}
+        state.guess_distribution_loading = true
+    },
+    [PLAYER_GUESS_DISTRIBUTION_SUCCESS](state, data) {
+        state.guess_distribution_loading = false
+        state.guess_distribution_error = false
+        state.guess_distribution = data
+    },
+    [PLAYER_GUESS_DISTRIBUTION_ERROR](state, error) {
+        state.guess_distribution_error = true
+        state.guess_distribution_loading = false
     },
     [PLAYER_ALL_BEGIN](state) {
         state.all_loading = true

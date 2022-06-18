@@ -61,7 +61,7 @@ export default {
   props: {
     title: String,
     icon: String,
-    items: Array,
+    items: [],
     headers: Array,
     items_per_page: Number,
     hide_footer: Boolean,

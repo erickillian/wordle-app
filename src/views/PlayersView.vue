@@ -19,8 +19,9 @@
             v-if="!$store.state.player.stats_error"
             :playerStats="$store.state.player.stats"
             :playerWordles="$store.state.player.wordles"
+            :guessDistribution="$store.state.player.guess_distribution"
         />
-        <v-card>
+        <v-card v-else>
             <v-card-title primary-title align-center>
                 <v-icon left>
                 mdi-arrow-left-circle-outline
