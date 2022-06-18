@@ -34,6 +34,7 @@ class WordleSerializer(serializers.ModelSerializer):
     player_name = serializers.CharField(source='player.full_name', read_only=True)
     time = serializers.DurationField()
     rank = serializers.IntegerField(required=False)
+    streak = serializers.IntegerField(required=False)
     class Meta:
         model = Wordle
         fields = '__all__'

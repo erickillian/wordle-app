@@ -147,6 +147,7 @@ export default {
                     sortable: false,
                 },
                 { text: 'Time', sortable: false, value: 'time' },
+                { text: 'Streak', sortable: false, value: 'streak' },
             ],
             wall_of_shame_headers: [
                 {
