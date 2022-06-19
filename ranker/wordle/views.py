@@ -216,6 +216,22 @@ class WordleLeadersGuesses(APIView):
         serializer = PlayerSerializer(queryset, many=True)
         return Response(serializer.data)
 
+class WordleStats(APIView):
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = PlayerSerializer
+
+    def get(self, request):
+
+        num_wordles = Wordle.objects.all().count()
+        num_players = Player.objects.all().count()
+
+        response = {}
+        response['num_wordles'] = num_wordles
+        response['num_players'] = num_players
+
+        return Response(response)
+
 
 class WordleWallOfShame(APIView):
     authentication_classes = [SessionAuthentication]

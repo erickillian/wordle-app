@@ -7,6 +7,9 @@ import {
     WORDLE_GUESS_ERROR,
     WORDLE_GUESS_SUCCESS,
     WORDLE_GUESS_RESPONDED,
+    WORDLE_STATS_BEGIN,
+    WORDLE_STATS_ERROR,
+    WORDLE_STATS_SUCCESS,
 } from './types';
 
 
@@ -25,7 +28,12 @@ const initialState = {
         start_time: '',
         correct: '',
     },
-    errors: {}
+    errors: {},
+    stats_loading: false,
+    stats: {
+        num_wordles: 0,
+        num_players: 0,
+    },
 };
 
 const getters = {
@@ -45,9 +53,29 @@ const actions = {
             .then(({ data }) => commit(WORDLE_GUESS_SUCCESS, data))
             .catch((error) => commit(WORDLE_GUESS_ERROR, error.response.data));
     },
+    stats({ commit }) {
+        commit(WORDLE_STATS_BEGIN);
+        return wordle.stats()
+            .then(({ data }) => commit(WORDLE_STATS_SUCCESS, data))
+            .catch((error) => commit(WORDLE_STATS_ERROR, error.response.data));
+    },
 };
 
 const mutations = {
+    [WORDLE_STATS_BEGIN](state) {
+        state.stats_loading = true
+        state.stats_error = false
+    },
+    [WORDLE_STATS_SUCCESS](state, data) {
+        state.stats_loading = false
+        state.stats_error = false
+        state.stats = data
+    },
+    [WORDLE_STATS_ERROR](state, error) {
+        state.stats_error = true
+        state.stats_loading = false
+    },
+
     [WORDLE_STATUS_BEGIN](state) {
         state.initial_load = false
         state.status_loading = true

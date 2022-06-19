@@ -19,4 +19,7 @@ export default {
     timeLeaders() {
         return session.get('api/v1/wordle/leaders/time', {});
     },
+    stats() {
+        return session.get('api/v1/wordle/stats', {});
+    },
 };

@@ -4,11 +4,22 @@
         <v-row class="mb-3">
             <v-col
                 class="pt-0"
-                v-for="total in $store.state.lb.totals"
-                :key="total.id"
             >
                 <BigNumberCard 
-                    :total="total"
+                    title="Total Wordles"
+                    :loading="$store.state.wordle.stats_loading"
+                    :value="$store.state.wordle.stats.num_wordles"
+                    :key="$store.state.wordle.stats"
+                />
+            </v-col>
+            <v-col
+                class="pt-0"
+            >
+                <BigNumberCard 
+                    title="Total Players"
+                    :loading="$store.state.wordle.stats_loading"
+                    :value="$store.state.wordle.stats.num_players"
+                    :key="$store.state.wordle.stats"
                 />
             </v-col>
         </v-row>
@@ -28,8 +39,8 @@
                     icon="mdi-trophy"
                     :items="$store.state.leaderboards.wordle.today"
                     :headers="todays_wordle_headers"
-                    :items_per_page="10"
-                    :hide_footer="false"
+                    items_per_page="10"
+                    hide_footer="false"
                 />
             </v-col>
         </v-row>
@@ -43,8 +54,8 @@
                     icon="mdi-trophy"
                     :items="$store.state.leaderboards.wordle.leaders.avg_guesses"
                     :headers="avg_guesses_headers"
-                    :items_per_page="5"
-                    :hide_footer="true"
+                    items_per_page="5"
+                    hide_footer="true"
                 />
             </v-col>
             <v-col class="pt-0">
@@ -125,7 +136,7 @@ export default {
     name: "HomeView",
     components: { BigNumberCard, WordleListCard },
     created() {
-        this.$store.dispatch("fetchLeaderboard");
+        this.$store.dispatch("wordle/stats");
         this.$store.dispatch("leaderboards/wordleFails");
         this.$store.dispatch("leaderboards/todaysWordles");
         this.$store.dispatch("leaderboards/wordleAvgGuesses");

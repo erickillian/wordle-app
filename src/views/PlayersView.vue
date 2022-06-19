@@ -32,7 +32,6 @@
     </v-col>
       <v-btn
         fab
-        small
         fixed
         right
         bottom

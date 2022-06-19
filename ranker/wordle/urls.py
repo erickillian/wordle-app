@@ -11,6 +11,7 @@ urlpatterns = [
     path('wordle/shame', views.WordleWallOfShame.as_view()),
     path('wordle/leaders/guesses', views.WordleLeadersGuesses.as_view()),
     path('wordle/leaders/time', views.WordleLeadersTime.as_view()),
+    path('wordle/stats', views.WordleStats.as_view()),
 ]
 
 router = DefaultRouter()

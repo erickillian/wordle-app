@@ -19,14 +19,15 @@ const initialState = {
     wordle: {
         today_loading: false,
         today: [],
-        fails: [],
+        shame_loading: false,
+        shame: [],
         total: null,
         leaders: {
             avg_guesses: [],
             avg_guesses_loading: false,
             avg_time: [],
             avg_time_loading: false,
-        }
+        },
     }
 };
 
@@ -59,9 +60,6 @@ const actions = {
             .then(({ data }) => commit(WORDLE_LEADERS_TIME_SUCCESS, data))
             .catch((error) => commit(WORDLE_LEADERS_TIME_ERROR));
     },
-    fetchLeaderboard(context) {
-
-    }
     // leaders({ commit }) {
     //     commit(WORDLE_LEADERS_BEGIN);
     //     return wordle.guess(guess)
