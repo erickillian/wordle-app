@@ -39,8 +39,8 @@
                     icon="mdi-trophy"
                     :items="$store.state.leaderboards.wordle.today"
                     :headers="todays_wordle_headers"
-                    items_per_page="10"
-                    hide_footer="false"
+                    :items_per_page="10"
+                    :hide_footer="false"
                 />
             </v-col>
         </v-row>
@@ -54,8 +54,8 @@
                     icon="mdi-trophy"
                     :items="$store.state.leaderboards.wordle.leaders.avg_guesses"
                     :headers="avg_guesses_headers"
-                    items_per_page="5"
-                    hide_footer="true"
+                    :items_per_page="5"
+                    :hide_footer="true"
                 />
             </v-col>
             <v-col class="pt-0">
