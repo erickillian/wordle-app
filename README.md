@@ -1,14 +1,16 @@
 # RANKER 🏓
 
-### Table Tennis (aka Ping Pong) Rankings and Stats for Offices or Local Leagues
+### General Games and Stats for Offices or Local Leagues
 
-Add players, events and match results. Ratings and leaderboard are updated automatically.
+##### !NOTE this site only contains convergle, a wordle clone
+
+Add players, Ratings and leaderboard are updated automatically.
 
 Hobby project, made with Django + DRF, VueJS (Vuex, Vue Rouer, Vuetify).
 
 #### Localization
 
-App is available in two languages: English and Russian.
+App is available in one languages: English. (Support could be added for more)
 
 ##### Local installation steps:
 
