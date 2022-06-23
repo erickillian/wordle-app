@@ -39,7 +39,6 @@ class ActiveWordle(models.Model):
                     word_copy.pop(word_copy.index(letter))
                 else:
                     correct += "0"
-                j += 1
         return correct
 
     @property
