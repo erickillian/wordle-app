@@ -23,7 +23,7 @@
             grow
           >
             <v-tab :title="$t('player_card.info.name')"><v-icon>mdi-chart-bubble</v-icon></v-tab>
-            <v-tab title="Convergle Guess Distribution"><v-icon>mdi-chart-areaspline</v-icon></v-tab>
+            <v-tab title="Wordle Guess Distribution"><v-icon>mdi-chart-areaspline</v-icon></v-tab>
             <v-tab :title="$t('player_card.history.name')"><v-icon>mdi-file-chart-outline</v-icon></v-tab>
 
            <v-tab-item class="pa-2">
@@ -47,7 +47,7 @@
             </v-tab-item>
 
             <v-tab-item class="pa-2">
-              <p class="overline">Convergle Guess Distribution</p>
+              <p class="overline">Wordle Guess Distribution</p>
               <BarChart
               :height="155"
               :chartData="chartData"
@@ -59,7 +59,7 @@
             <v-tab-item class="pa-2">
               <p class="overline">{{ $t('player_card.history.name') }}</p>
               <WordleListCard
-                    title="Convergle History"
+                    title="Wordle History"
                     icon="mdi-history"
                     :items="playerWordles"
                     :headers="todays_wordle_headers"

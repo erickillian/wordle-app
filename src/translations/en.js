@@ -10,7 +10,7 @@ export const ENGLISH_TRANSLATIONS = {
     },
     nav: {
         "main": "Home",
-        "convergle": "Convergle",
+        "wordle": "Wordle",
         "players": "Players",
         "login": "Login",
         "logout": "Logout",
@@ -51,7 +51,7 @@ export const ENGLISH_TRANSLATIONS = {
             "name": "Rating trend"
         },
         history: {
-            "name": "Convergles",
+            "name": "Wordles ",
             cols: {
                 "match_date": "Date",
                 "id": "Id",

@@ -14,7 +14,7 @@
     </v-app-bar-->
     <v-app-bar dense app extended extension-height="0" :elevation="2" :clipped-left="true">
         <img style="max-width: 40px; max-height: 40px" class="mr-3" src="/static/logo.png" />
-        <v-toolbar-title>Converge General Games Ranker</v-toolbar-title>
+        <v-toolbar-title>Wordle Ranker</v-toolbar-title>
 
         <v-spacer></v-spacer>
 
@@ -56,7 +56,7 @@ export default {
             menu: [
                 { name: this.$t("nav.main"), icon: "mdi-home-outline", to: "/" },
                 { name: this.$t("nav.players"), icon: "mdi-account", to: "/players" },
-                { name: this.$t("nav.convergle"), icon: "mdi-file-word-box-outline", to: "/wordle" },
+                { name: this.$t("nav.wordle"), icon: "mdi-file-word-box-outline", to: "/wordle" },
                 { name: this.$t("nav.logout"), icon: "mdi-login", to: "/logout" },
                 // {name: this.$t("nav.events"), icon: "mdi-bank", to: "/events"},
             ]

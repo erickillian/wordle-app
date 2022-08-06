@@ -35,7 +35,7 @@
         <v-row class="mb-3">
             <v-col class="pt-0">
                 <WordleListCard
-                    title="Todays Convergles"
+                    title="Todays Wordles"
                     icon="mdi-trophy"
                     :items="$store.state.leaderboards.wordle.today"
                     :headers="todays_wordle_headers"
@@ -72,7 +72,7 @@
         <v-row class="mb-3">
             <v-col class="pt-0">
                 <WordleListCard
-                    title="Convergle Wall of Shame"
+                    title="Wordle Wall of Shame"
                     icon="mdi-alert-outline"
                     :items="$store.state.leaderboards.wordle.shame"
                     :headers="wall_of_shame_headers"
