@@ -1,29 +1,39 @@
-# RANKER 🏓
+# Full-Stack Wordle Ranking Application  (django and vue.js)
+- Hobby project, made with Django + DRF, VueJS (Vuex, Vue Rouer, Vuetify).
+- App is available in one languages: English. (Support could be added for more)
 
-### General Games and Stats for Offices or Local Leagues
+## Features
 
-##### !NOTE this site only contains convergle, a wordle clone
+- Daily ranking system, first rankes wordles by number of guesses, then time
+- All time ranking (uses average guesses and average time after a player has completed 10 wordles)
 
-Add players, Ratings and leaderboard are updated automatically.
-
-Hobby project, made with Django + DRF, VueJS (Vuex, Vue Rouer, Vuetify).
-
-#### Localization
-
-App is available in one languages: English. (Support could be added for more)
-
-##### Local installation steps:
+## Local installation steps:
 
 1. Install docker and docker-compose
-2. Build the docker image `$ sudo docker-compose build`
-3. Launch the local version of the app `$ sudo docker-compose up -d`
-4. Create a super user account `$ sudo docker-compose exec web python3 manage.py createsuperuser`
-5. Use superuser account at `/admin` to manage the database content and to save new match results.
+2. Install npm (comes with node.js)
+3. Install npm packages and build production bundle
+```
+npm install
+npm run build
+```
+
+4. Build the docker image 
+```
+docker compose build
+```
+5. Launch the local version of the app as a daemon (background process)
+```
+docker compose up -d
+```
+6. Create a super user account 
+```
+sudo docker-compose exec web python3 manage.py createsuperuser
+```
+7. Use superuser account at `/admin` to manage and add users
 
 ##### Heroku deployment:
 
 > :warning: **This section is out of date and likely will not work**: If you want to contribute and help me get this working feel free
-
 
 1. Sign up for free Heroku account and install Heroku CLI
 2. Shell commands:
