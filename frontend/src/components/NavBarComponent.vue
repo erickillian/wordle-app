@@ -127,7 +127,8 @@ export default defineComponent({
             this.menuVisible = false;
         },
         isActiveRoute(link) {
-            return true;
+            console.log(this.router.currentRoute.path);
+            return this.router.currentRoute.path.startsWith(link);
         },
     },
 });
