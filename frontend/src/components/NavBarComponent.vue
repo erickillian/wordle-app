@@ -24,8 +24,8 @@
                         </template>
                         <v-card rounded="lg" min-width="400">
                             <v-card-title class="d-flex flex-column align-items-center text-center">
-                                <v-img v-if="user?.profile_picture" :src="user.profile_picture" alt="Profile Picture"
-                                    width="100" height="100" class="mb-3 mx-auto" />
+                                <UserProfilePicture />
+                                <v-spacer class="pa-2" />
                                 <div>
                                     <div>{{ user?.email }}</div>
                                 </div>
@@ -73,64 +73,62 @@ import { defineComponent, ref, watch, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import { useDisplay } from 'vuetify'; // Use Vuetify display helper
+import UserProfilePicture from '@/components/UserProfilePicture.vue';
 
 export default defineComponent({
-    setup() {
-        const store = useAuthStore(); // Use the auth store
+    name: 'NavBarComponent',
+    components: {
+        UserProfilePicture,
+    },
+    data() {
         const router = useRouter();
-        const isLoading = ref(false); // Loading state
-        const drawer = ref(false); // Drawer open/close state
-        const { smAndDown } = useDisplay(); // Use Vuetify's display helper
-        const user = store.user; // Get the user object from the store
-        const menuVisible = ref(false); // Local state for menu visibility
-
-        // Menu items with icons and links
-        const menuItems = [
-            { text: 'Dashboard', icon: 'mdi-view-dashboard', link: '/dashboard' },
-            { text: 'Users', icon: 'mdi-account-group', link: '/users' },
-            { text: 'Wordle', icon: 'mdi-alpha-w-box-outline', link: '/wordle' },
-            { text: 'Dictionary', icon: 'mdi-book-open-page-variant', link: '/words' },
-            { text: 'Edit Profile', icon: 'mdi-account', link: '/profile' },
-            { text: 'Logout', icon: 'mdi-logout', link: '/logout' },
-        ];
-
-        // Watch the auth store for apiRequestLoading and update the isLoading ref
-        watch(() => store.apiRequestLoading, (newVal) => {
-            console.log(newVal);
-            isLoading.value = newVal;
-        });
-
-        // Computed property for controlling drawer based on screen size
-        const drawerState = computed(() => smAndDown.value ? drawer.value : false);
-
-        // Toggle drawer visibility
-        const toggleDrawer = () => {
-            if (smAndDown.value) {
-                drawer.value = !drawer.value; // Toggle only on mobile
-            }
-        };
-
-        // Navigate function that closes the drawer after navigating
-        const navigate = (link) => {
-            router.push(link);
-            drawer.value = false; // Close drawer after clicking on a menu item
-            menuVisible.value = false; // Close the dropdown menu
-        };
-
-        // Check if the current route matches the base route or any of its subroutes
-        const isActiveRoute = (link) => {
-            return router.currentRoute.value.path.startsWith(link);
-        };
+        const { smAndDown } = useDisplay();
+        const store = useAuthStore();
 
         return {
-            drawer: drawerState,
-            menuItems,
-            user,
-            menuVisible,
-            navigate,
-            isActiveRoute,
-            toggleDrawer,
+            isLoading: false,
+            drawer: false,
+            menuVisible: false,
+            menuItems: [
+                { text: 'Dashboard', icon: 'mdi-view-dashboard', link: '/dashboard' },
+                { text: 'Users', icon: 'mdi-account-group', link: '/users' },
+                { text: 'Wordle', icon: 'mdi-alpha-w-box-outline', link: '/wordle' },
+                { text: 'Dictionary', icon: 'mdi-book-open-page-variant', link: '/words' },
+                { text: 'Edit Profile', icon: 'mdi-account', link: '/profile' },
+                { text: 'Logout', icon: 'mdi-logout', link: '/logout' },
+            ],
+            smAndDown,
+            store,
+            router,
         };
+    },
+    computed: {
+        user() {
+            return this.store.user;
+        },
+        drawerState() {
+            return this.smAndDown ? this.drawer : false;
+        },
+    },
+    watch: {
+        'store.apiRequestLoading'(newVal) {
+            this.isLoading = newVal;
+        },
+    },
+    methods: {
+        toggleDrawer() {
+            if (this.smAndDown) {
+                this.drawer = !this.drawer;
+            }
+        },
+        navigate(link) {
+            this.router.push(link);
+            this.drawer = false;
+            this.menuVisible = false;
+        },
+        isActiveRoute(link) {
+            return true;
+        },
     },
 });
 </script>

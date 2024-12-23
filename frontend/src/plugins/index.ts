@@ -8,6 +8,7 @@
 import vuetify from './vuetify';
 import pinia from '../stores';
 import router from '../router';
+import ToastPlugin from './toast';
 
 // Pinia persistence plugin
 import piniaPersist from 'pinia-plugin-persistedstate';
@@ -21,6 +22,6 @@ export function registerPlugins(app: App) {
     app
         .use(vuetify)
         .use(router)
-        .use(pinia);
-        
+        .use(pinia)
+        .use(ToastPlugin);
 }
