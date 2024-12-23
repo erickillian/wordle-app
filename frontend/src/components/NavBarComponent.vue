@@ -1,7 +1,7 @@
 <template>
     <div>
         <v-app-bar dense app extended extension-height="0" :elevation="0" :clipped-left="true">
-            <v-toolbar-title>Wordle</v-toolbar-title>
+            <v-toolbar-title @click="navigate('/dashboard')" style="cursor: pointer;">Wordle</v-toolbar-title>
             <v-spacer></v-spacer>
 
             <!-- Mobile Menu Toggle (visible only on small screens) -->
