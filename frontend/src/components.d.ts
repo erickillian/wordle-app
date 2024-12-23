@@ -9,6 +9,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     BarGraph: typeof import('./components/graphs/BarGraph.vue')['default']
     BigNumberCard: typeof import('./components/BigNumberCard.vue')['default']
+    copy: typeof import('./components/UserSessionCard copy.vue')['default']
     DashboardListCard: typeof import('./components/DashboardListCard.vue')['default']
     ExtraWordleRankingsCard: typeof import('./components/wordle/ExtraWordleRankingsCard.vue')['default']
     MyWordleCard: typeof import('./components/MyWordleCard.vue')['default']
@@ -20,6 +21,7 @@ declare module 'vue' {
     StaticWordleComponent: typeof import('./components/wordle/StaticWordleComponent.vue')['default']
     TestWordleComponent: typeof import('./components/wordle/TestWordleComponent.vue')['default']
     TimeClockComponent: typeof import('./components/wordle/TimeClockComponent.vue')['default']
+    UserProfilePicture: typeof import('./components/UserProfilePicture.vue')['default']
     UserSelfComponent: typeof import('./components/UserSelfComponent.vue')['default']
     UserSessionCard: typeof import('./components/UserSessionCard.vue')['default']
     UsersSearchComponent: typeof import('./components/UsersSearchComponent.vue')['default']

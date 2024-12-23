@@ -14,17 +14,18 @@
                 <v-list-item>
                     <!-- Dropdown Menu -->
                     <v-menu v-model="menuVisible" offset-y :close-on-content-click="false"
-                        @click-outside="menuVisible = false">
+                        @click-outside="menuVisible = false" transition="none" transition-duration="0" open-delay="0"
+                        close-delay="0" :eager="true">
                         <template v-slot:activator="{ props: activatorProps }">
                             <v-btn icon v-bind="activatorProps">
-                                <v-img v-if="user?.profile_picture" :src="getProfilePictureUrl(user.profile_picture)"
-                                    alt="Profile Picture" width="46" height="46" />
+                                <v-img v-if="user?.profile_picture" :src="user.profile_picture" alt="Profile Picture"
+                                    width="46" height="46" />
                             </v-btn>
                         </template>
                         <v-card rounded="lg" min-width="400">
                             <v-card-title class="d-flex flex-column align-items-center text-center">
-                                <v-img v-if="user?.profile_picture" :src="getProfilePictureUrl(user.profile_picture)"
-                                    alt="Profile Picture" width="100" height="100" class="mb-3 mx-auto" />
+                                <v-img v-if="user?.profile_picture" :src="user.profile_picture" alt="Profile Picture"
+                                    width="100" height="100" class="mb-3 mx-auto" />
                                 <div>
                                     <div>{{ user?.email }}</div>
                                 </div>
@@ -33,7 +34,8 @@
                                 <v-btn text @click="navigate('/profile')" >Edit Profile</v-btn>
                             </v-card-actions> -->
                             <v-list>
-                                <v-list-item v-for=" item in menuItems" :key="item.icon" @click="navigate(item.link)" :to="item.link">
+                                <v-list-item v-for=" item in menuItems" :key="item.icon" @click="navigate(item.link)"
+                                    :to="item.link">
                                     <template v-slot:prepend>
                                         <v-icon>{{ item.icon }}</v-icon>
                                     </template>
@@ -42,7 +44,7 @@
                             </v-list>
                         </v-card>
 
-                </v-menu>
+                    </v-menu>
                 </v-list-item>
             </v-toolbar-items>
 
@@ -120,11 +122,6 @@ export default defineComponent({
             return router.currentRoute.value.path.startsWith(link);
         };
 
-        // Function to get the profile picture URL
-        const getProfilePictureUrl = (picture_url) => {
-            return `/static/profile_pictures/${picture_url}`;
-        }
-
         return {
             drawer: drawerState,
             menuItems,
@@ -133,7 +130,6 @@ export default defineComponent({
             navigate,
             isActiveRoute,
             toggleDrawer,
-            getProfilePictureUrl,
         };
     },
 });

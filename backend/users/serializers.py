@@ -8,11 +8,27 @@ import requests
 
 User = get_user_model()
 
+profile_picture_prefix = "/static/profile_pictures/"
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["slug", "display_name", "profile_picture"]
+
+    def to_internal_value(self, data):
+        if "profile_picture" in data:
+            profile_picture = data["profile_picture"]
+            if profile_picture.startswith(profile_picture_prefix):
+                data["profile_picture"] = profile_picture[len(profile_picture_prefix) :]
+
+        return super().to_internal_value(data)
+
+    def to_representation(self, instance):
+        if instance.profile_picture:
+            instance.profile_picture = (
+                f"{profile_picture_prefix}{instance.profile_picture}"
+            )
+        return super().to_representation(instance)
 
 
 class UserSelfSerializer(serializers.ModelSerializer):
@@ -24,6 +40,20 @@ class UserSelfSerializer(serializers.ModelSerializer):
         model = User
         fields = ["slug", "email", "full_name", "date_joined", "color_mode", "profile_picture", "display_name"]
         read_only_fields = ["email", "date_joined", "slug", "display_name"]
+
+    def to_internal_value(self, data):
+        if "profile_picture" in data:
+            profile_picture = data["profile_picture"]
+            if profile_picture.startswith(profile_picture_prefix):
+                data["profile_picture"] = profile_picture[len(profile_picture_prefix) :]
+        return super().to_internal_value(data)
+
+    def to_representation(self, instance):
+        if instance.profile_picture:
+            instance.profile_picture = (
+                f"{profile_picture_prefix}{instance.profile_picture}"
+            )
+        return super().to_representation(instance)
 
 
 class UserLoginSerializer(serializers.Serializer):
