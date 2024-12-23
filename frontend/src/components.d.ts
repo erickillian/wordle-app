@@ -9,7 +9,6 @@ declare module 'vue' {
   export interface GlobalComponents {
     BarGraph: typeof import('./components/graphs/BarGraph.vue')['default']
     BigNumberCard: typeof import('./components/BigNumberCard.vue')['default']
-    copy: typeof import('./components/UserSessionCard copy.vue')['default']
     DashboardListCard: typeof import('./components/DashboardListCard.vue')['default']
     ExtraWordleRankingsCard: typeof import('./components/wordle/ExtraWordleRankingsCard.vue')['default']
     MyWordleCard: typeof import('./components/MyWordleCard.vue')['default']
