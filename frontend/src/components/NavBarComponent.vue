@@ -53,7 +53,7 @@
         </v-app-bar>
 
         <!-- Mobile Drawer (visible only on small screens) -->
-        <v-navigation-drawer v-model="drawer" absolute persistent location="top">
+        <v-navigation-drawer v-model="navigationDrawer"  persistent location="top" >
             <v-list>
                 <!-- List Items with Icon and Title -->
                 <v-list-item v-for="(item, i) in menuItems" :key="i" @click="navigate(item.link)" color="primary"
@@ -82,12 +82,12 @@ export default defineComponent({
     },
     data() {
         const router = useRouter();
-        const { smAndDown } = useDisplay();
+        const { smAndDown, lgAndUp } = useDisplay();
         const store = useAuthStore();
 
         return {
             isLoading: false,
-            drawer: false,
+            navigationDrawer: false,
             menuVisible: false,
             menuItems: [
                 { text: 'Dashboard', icon: 'mdi-view-dashboard', link: '/dashboard' },
@@ -98,6 +98,7 @@ export default defineComponent({
                 { text: 'Logout', icon: 'mdi-logout', link: '/logout' },
             ],
             smAndDown,
+            lgAndUp,
             store,
             router,
         };
@@ -106,28 +107,28 @@ export default defineComponent({
         user() {
             return this.store.user;
         },
-        drawerState() {
-            return this.smAndDown ? this.drawer : false;
-        },
     },
     watch: {
-        'store.apiRequestLoading'(newVal) {
-            this.isLoading = newVal;
+        navigationDrawer(newVal) {
+            if (this.lgAndUp) {
+                this.navigationDrawer = false;
+            }
         },
     },
     methods: {
         toggleDrawer() {
             if (this.smAndDown) {
-                this.drawer = !this.drawer;
+                this.navigationDrawer = !this.navigationDrawer;
+            } else {
+                this.navigationDrawer = false;
             }
         },
         navigate(link) {
             this.router.push(link);
-            this.drawer = false;
+            this.navigationDrawer = false;
             this.menuVisible = false;
         },
         isActiveRoute(link) {
-            console.log(this.router.currentRoute.path);
             return this.router.currentRoute.path.startsWith(link);
         },
     },
