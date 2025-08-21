@@ -69,7 +69,7 @@
                                 <div style="display: flex; align-items: center;">
                                     <v-list-item-media>
                                         <v-img
-                                            :src="getProfilePictureUrl(item.user ? item.user.profile_picture : item.profile_picture)"
+                                            :src="item.user ? item.user.profile_picture : getProfilePictureUrl(item.profile_picture)"
                                             width="32" height="32" class="mr-2" />
                                     </v-list-item-media>
 
